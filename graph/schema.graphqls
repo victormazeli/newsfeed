@@ -1,0 +1,43 @@
+scalar Timestamp
+### User Queries ###
+type User {
+  id: ID!
+  email: String!
+  password: String!
+  otp_code: String!
+  role: String!
+  status: String!
+  isEmailVerified: Boolean!
+  otp_expire_time: Timestamp!
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
+  deletedAt: Timestamp!
+}
+
+input UserSignUpDetail {
+    email: String!
+    password: String!
+}
+
+type Mutation {
+    ManualSignUp(input: UserSignUpDetail!): User!
+}
+
+type Query {
+    user(_id: String!): User!
+}
+
+### Auth Queries ###
+type AuthResponse {
+    access_token: String!
+    refresh_token: String!
+}
+
+input LoginCredential {
+    email: String!
+    password: String!
+}
+
+extend type Mutation {
+    ManualLogin(input: LoginCredential!): AuthResponse!
+}
