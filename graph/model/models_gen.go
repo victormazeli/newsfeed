@@ -2,31 +2,47 @@
 
 package model
 
-type AuthResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+type Article struct {
+	Author      string  `json:"author"`
+	Source      *Source `json:"source"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	URL         string  `json:"url"`
+	URLToImage  string  `json:"urlToImage"`
+	PublishedAt string  `json:"publishedAt"`
+	Content     *string `json:"content"`
 }
 
-type LoginCredential struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+type CreateUser struct {
+	Email    string    `json:"email"`
+	Picture  string    `json:"picture"`
+	FullName string    `json:"full_name"`
+	Topics   []*string `json:"topics"`
+	UserID   string    `json:"user_id"`
+}
+
+type Response struct {
+	Status       string     `json:"status"`
+	TotalResults int        `json:"totalResults"`
+	Articles     []*Article `json:"articles"`
+}
+
+type Source struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type Topic struct {
+	Topic string `json:"topic"`
 }
 
 type User struct {
-	ID              string `json:"id"`
-	Email           string `json:"email"`
-	Password        string `json:"password"`
-	OtpCode         string `json:"otp_code"`
-	Role            string `json:"role"`
-	Status          string `json:"status"`
-	IsEmailVerified bool   `json:"isEmailVerified"`
-	OtpExpireTime   string `json:"otp_expire_time"`
-	CreatedAt       string `json:"createdAt"`
-	UpdatedAt       string `json:"updatedAt"`
-	DeletedAt       string `json:"deletedAt"`
-}
-
-type UserSignUpDetail struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	ID        string   `json:"_id"`
+	Email     string   `json:"email"`
+	Picture   string   `json:"picture"`
+	FullName  string   `json:"full_name"`
+	Topics    []*Topic `json:"topics"`
+	UserID    string   `json:"user_id"`
+	CreatedAt string   `json:"created_at"`
+	UpdatedAt string   `json:"updated_at"`
 }

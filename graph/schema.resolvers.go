@@ -5,35 +5,109 @@ package graph
 
 import (
 	"context"
-	"fmt"
-	"gatewayservice/graph/generated"
-	"gatewayservice/graph/model"
-	"gatewayservice/handlers"
+	"errors"
+	"newsfeedbackend/graph/generated"
+	"newsfeedbackend/graph/model"
+	"newsfeedbackend/handlers"
+	"newsfeedbackend/middlewares"
 )
 
-// ManualSignUp is the resolver for the ManualSignUp field.
-func (r *mutationResolver) ManualSignUp(ctx context.Context, input model.UserSignUpDetail) (*model.User, error) {
-	addedUser, err := handlers.AuthHandler{}.UserRegistration(input)
-	if err == nil {
-		return addedUser, nil
-	} else {
+// CreateNewUser is the resolver for the CreateNewUser field.
+func (r *mutationResolver) CreateNewUser(ctx context.Context, input model.CreateUser) (*model.User, error) {
+	checkUser := handlers.Handler{}.GetUserByEmail(input.Email)
+	if checkUser != nil {
+		err := errors.New("user already exist")
+		return nil, err
+
+	}
+	newUser := handlers.Handler{}.NewUser(input)
+	if newUser == nil {
+		err := errors.New("unable to create user")
 		return nil, err
 	}
+
+	var topicsFromDB []*model.Topic
+	for _, t := range newUser.Topics {
+		item := model.Topic{
+			Topic: t.Topic,
+		}
+		topicsFromDB = append(topicsFromDB, &item)
+	}
+
+	user := &model.User{
+		Email:  newUser.Email,
+		UserID: newUser.UserId,
+		Topics: topicsFromDB,
+		ID:     newUser.ID.String(),
+	}
+	return user, nil
 }
 
-// ManualLogin is the resolver for the ManualLogin field.
-func (r *mutationResolver) ManualLogin(ctx context.Context, input model.LoginCredential) (*model.AuthResponse, error) {
-	tokenPair, err := handlers.AuthHandler{}.UserLogin(input)
-	if err == nil {
-		return tokenPair, nil
-	} else {
+// GetUser is the resolver for the GetUser field.
+func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
 		return nil, err
 	}
+	sub, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+	id := sub.UserID
+	getUser := handlers.Handler{}.GetUserByAuth0Id(id)
+
+	if getUser == nil {
+		err := errors.New("unable to fetch user")
+		return nil, err
+	}
+
+	var topicsFromDB []*model.Topic
+	for _, t := range getUser.Topics {
+		item := model.Topic{
+			Topic: t.Topic,
+		}
+		topicsFromDB = append(topicsFromDB, &item)
+	}
+
+	user := &model.User{
+		Email:     getUser.Email,
+		UserID:    getUser.UserId,
+		Picture:   getUser.Picture,
+		FullName:  getUser.FullName,
+		ID:        getUser.ID.String(),
+		Topics:    topicsFromDB,
+		UpdatedAt: getUser.UpdatedAt,
+		CreatedAt: getUser.CreatedAt,
+	}
+
+	return user, nil
 }
 
-// User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+// GetNews is the resolver for the GetNews field.
+func (r *queryResolver) GetNews(ctx context.Context, query string) ([]*model.Article, error) {
+	getNews, err := handlers.Handler{}.FetchNews(query, r.Env, ctx)
+	if err != nil {
+		return nil, err
+	}
+	return getNews, nil
+}
+
+// NewsFeed is the resolver for the NewsFeed field.
+func (r *queryResolver) NewsFeed(ctx context.Context) ([]*model.Article, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sub, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+	id := sub.UserID
+	newsFeed, er := handlers.Handler{}.NewsFeed(r.Env, id, ctx)
+	if er != nil {
+		return nil, er
+	}
+	return newsFeed, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
