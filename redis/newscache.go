@@ -28,24 +28,28 @@ func (n NewsCacheService) SetNews(ctx context.Context, topic string, articles []
 		log.Printf("Error converting article to json, %s", err)
 		panic(err)
 	}
-	err = redisClient.Set(ctx, topic, jsonStr, 10800).Err()
-	if err != nil {
-		panic(err)
+	er := redisClient.Set(ctx, topic, jsonStr, 0).Err()
+	if er != nil {
+		panic(er)
 	}
 
 }
 
 func (n NewsCacheService) GetNews(ctx context.Context, topic string) []*model.Article {
 	value, err := redisClient.Get(ctx, topic).Result()
-	if err != nil {
+	if err == redis.Nil {
 		return nil
+	} else if err != nil {
+		panic(err)
+	} else {
+		var article []*model.Article
+		er := json.Unmarshal([]byte(value), &article)
+		if er != nil {
+			log.Printf("Error converting json string to article object, %s", err)
+			return nil
+		}
+		return article
+
 	}
-	var article []*model.Article
-	err = json.Unmarshal([]byte(value), &article)
-	if err != nil {
-		log.Printf("Error converting json string to article object, %s", err)
-		return nil
-	}
-	return article
 
 }
