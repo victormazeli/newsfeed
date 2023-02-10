@@ -58,3 +58,12 @@ newsfeedbackend
 |
 
 ````
+### Project structure Break Down
+1. `/config` contains all application configuration
+2. `/database` contains database configuration and database model / schema
+3. `/graph` contains all graphql related files and folder including graphql schema, resolvers etc.
+4. `/handlers` contains methods and functions that performs specific actions for a particular use case
+5. `/middlewares` contains all application middlewares
+6. `/redis` contains redis configuration for the project
+7. `/utils` contains common utility functions to be used all over the project
+8. `main` this is the entry point of the application, includes route setup, server setup, configuration setup etc.
