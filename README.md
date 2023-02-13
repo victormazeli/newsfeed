@@ -74,13 +74,13 @@ newsfeedbackend
 3. Gqlgen
 4. viper
 5. redis
-6. Gorm
-7. Mysql
+6. Mgm
+7. Mongodb
 8. resty
 
 ### References
 1. Graphql (gqlgen): https://gqlgen.com/
 2. Gin: https://gin-gonic.com/
-3. Gorm: https://gorm.io/
+3. mgm: https://github.com/Kamva/mgm
 4. resty: https://github.com/go-resty/resty
 5. viper: https://github.com/spf13/viper
