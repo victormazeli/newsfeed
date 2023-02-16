@@ -58,6 +58,81 @@ newsfeedbackend
 |
 
 ````
+
+### How to make request
+
+1. Create new user
+
+```
+mutation{
+  CreateNewUser(input:{email: "test@gmail.com", picture:"NA", full_name:"test name", user_id:"4VMDoJ2zAZ9fTPDh2a4nzs6In7OFU3eu@clients", topics:["sport","bitcoin"]}){
+    _id
+    email
+    picture
+    full_name
+    topics{
+      topic
+    }
+    user_id
+    created_at
+    updated_at
+}
+}
+
+```
+2. Get user info
+
+```
+query{
+  GetUser{
+    _id
+    email
+    picture
+    full_name
+    topics{
+      topic
+    }
+    user_id
+    created_at
+    updated_at
+  }
+  
+}
+```
+3. Get News feed
+
+```
+query{
+  NewsFeed{
+    author
+    title
+    description
+    url
+    urlToImage
+    publishedAt
+    content
+    source{
+      id
+      name
+    }
+  }
+  
+}
+```
+
+Note: ensure to pass the token to the request header while making a request, Token are generated from auth0 a sample postman 
+docs on generating a token. [click here](https://documenter.getpostman.com/view/12847208/2s935vjz6r)
+
+```
+{
+
+Authorization: "YOUR_TOKEN"
+
+}
+```
+
+
+
 ### Project structure Break Down
 1. `/config` contains all application configuration
 2. `/database` contains database configuration and database model / schema
