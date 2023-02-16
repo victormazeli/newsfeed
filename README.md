@@ -142,3 +142,20 @@ Authorization: "YOUR_TOKEN"
 6. `/redis` contains redis configuration for the project
 7. `/utils` contains common utility functions to be used all over the project
 8. `main` this is the entry point of the application, includes route setup, server setup, configuration setup etc.
+
+### Tools
+1. Go (1.19)
+2. Gin
+3. Gqlgen
+4. viper
+5. redis
+6. Mgm
+7. Mongodb
+8. resty
+
+### References
+1. Graphql (gqlgen): https://gqlgen.com/
+2. Gin: https://gin-gonic.com/
+3. mgm: https://github.com/Kamva/mgm
+4. resty: https://github.com/go-resty/resty
+5. viper: https://github.com/spf13/viper
