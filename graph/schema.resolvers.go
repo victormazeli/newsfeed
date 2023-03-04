@@ -53,8 +53,8 @@ func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 	if er != nil {
 		return nil, er
 	}
-	id := sub.UserID
-	getUser := handlers.Handler{}.GetUserByAuth0Id(id)
+	email := sub.Email
+	getUser := handlers.Handler{}.GetUserByEmail(email)
 
 	if getUser == nil {
 		err := errors.New("unable to fetch user")
@@ -102,8 +102,9 @@ func (r *queryResolver) NewsFeed(ctx context.Context) ([]*model.Article, error) 
 	if er != nil {
 		return nil, er
 	}
-	id := sub.UserID
-	newsFeed, er := handlers.Handler{}.NewsFeed(r.Env, id, ctx)
+	email := sub.Email
+
+	newsFeed, er := handlers.Handler{}.NewsFeed(r.Env, email, ctx)
 	if er != nil {
 		return nil, er
 	}

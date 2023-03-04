@@ -39,7 +39,7 @@ func ValidateToken(bearerToken string, env *config.Env) (*model.User, error) {
 		return nil, ErrInvalidToken
 	}
 
-	subValue, ok := token.Get("sub")
+	subValue, ok := token.Get("email")
 	if !ok {
 		log.Print("error no sub found")
 		return nil, ErrInvalidToken
@@ -63,7 +63,7 @@ func ValidateToken(bearerToken string, env *config.Env) (*model.User, error) {
 	//}{sub}
 
 	payload := &model.User{
-		UserID: sub,
+		Email: sub,
 	}
 
 	return payload, nil

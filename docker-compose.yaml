@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5800:5800"
+    env_file:
+      - development.env
+    networks:
+      - newsfeed_network
+
+  redis_srv:
+    image: 'bitnami/redis:latest'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - newsfeed_network
+
+networks:
+  newsfeed_network:

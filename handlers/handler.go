@@ -120,10 +120,10 @@ func (h Handler) FetchNews(query string, env *config.Env, ctx context.Context) (
 	}
 
 }
-func (h Handler) NewsFeed(env *config.Env, userId string, ctx context.Context) ([]*model.Article, error) {
+func (h Handler) NewsFeed(env *config.Env, email string, ctx context.Context) ([]*model.Article, error) {
 	user := &models.User{}
 
-	err := mgm.Coll(user).First(bson.M{"userid": userId}, user)
+	err := mgm.Coll(user).First(bson.M{"email": email}, user)
 
 	if err != nil {
 		er := errors.New("user not found")
