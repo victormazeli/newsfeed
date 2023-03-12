@@ -18,7 +18,30 @@ type CreateUser struct {
 	Picture  string    `json:"picture"`
 	FullName string    `json:"full_name"`
 	Topics   []*string `json:"topics"`
-	UserID   string    `json:"user_id"`
+	Password string    `json:"password"`
+}
+
+type ForgotPassword struct {
+	Email string `json:"email"`
+}
+
+type GenericResponse struct {
+	Message string `json:"message"`
+}
+
+type Login struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	User  *User  `json:"user"`
+	Token string `json:"token"`
+}
+
+type ResetPassword struct {
+	Email       string `json:"email"`
+	NewPassword string `json:"newPassword"`
 }
 
 type Response struct {
@@ -37,12 +60,18 @@ type Topic struct {
 }
 
 type User struct {
-	ID        string   `json:"_id"`
-	Email     string   `json:"email"`
-	Picture   string   `json:"picture"`
-	FullName  string   `json:"full_name"`
-	Topics    []*Topic `json:"topics"`
-	UserID    string   `json:"user_id"`
-	CreatedAt string   `json:"created_at"`
-	UpdatedAt string   `json:"updated_at"`
+	ID              string   `json:"_id"`
+	Email           string   `json:"email"`
+	Picture         string   `json:"picture"`
+	FullName        string   `json:"full_name"`
+	Topics          []*Topic `json:"topics"`
+	IsVerified      bool     `json:"is_verified"`
+	IsOtpVerified   bool     `json:"is_otp_verified"`
+	IsPasswordReset bool     `json:"is_password_reset"`
+	CreatedAt       string   `json:"created_at"`
+	UpdatedAt       string   `json:"updated_at"`
+}
+
+type VerifyOtp struct {
+	Otp string `json:"otp"`
 }

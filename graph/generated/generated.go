@@ -55,8 +55,22 @@ type ComplexityRoot struct {
 		URLToImage  func(childComplexity int) int
 	}
 
+	GenericResponse struct {
+		Message func(childComplexity int) int
+	}
+
+	LoginResponse struct {
+		Token func(childComplexity int) int
+		User  func(childComplexity int) int
+	}
+
 	Mutation struct {
-		CreateNewUser func(childComplexity int, input model.CreateUser) int
+		CreateNewUser  func(childComplexity int, input model.CreateUser) int
+		ForgotPassword func(childComplexity int, input model.ForgotPassword) int
+		Login          func(childComplexity int, input model.Login) int
+		ResetPassword  func(childComplexity int, input model.ResetPassword) int
+		VerifyEmail    func(childComplexity int, input model.VerifyOtp) int
+		VerifyResetOtp func(childComplexity int, input model.VerifyOtp) int
 	}
 
 	Query struct {
@@ -81,19 +95,26 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		CreatedAt func(childComplexity int) int
-		Email     func(childComplexity int) int
-		FullName  func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Picture   func(childComplexity int) int
-		Topics    func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
-		UserID    func(childComplexity int) int
+		CreatedAt       func(childComplexity int) int
+		Email           func(childComplexity int) int
+		FullName        func(childComplexity int) int
+		ID              func(childComplexity int) int
+		IsOtpVerified   func(childComplexity int) int
+		IsPasswordReset func(childComplexity int) int
+		IsVerified      func(childComplexity int) int
+		Picture         func(childComplexity int) int
+		Topics          func(childComplexity int) int
+		UpdatedAt       func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
 	CreateNewUser(ctx context.Context, input model.CreateUser) (*model.User, error)
+	Login(ctx context.Context, input model.Login) (*model.LoginResponse, error)
+	ForgotPassword(ctx context.Context, input model.ForgotPassword) (*model.GenericResponse, error)
+	ResetPassword(ctx context.Context, input model.ResetPassword) (*model.GenericResponse, error)
+	VerifyEmail(ctx context.Context, input model.VerifyOtp) (*model.GenericResponse, error)
+	VerifyResetOtp(ctx context.Context, input model.VerifyOtp) (*model.GenericResponse, error)
 }
 type QueryResolver interface {
 	GetUser(ctx context.Context) (*model.User, error)
@@ -172,6 +193,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Article.URLToImage(childComplexity), true
 
+	case "GenericResponse.message":
+		if e.complexity.GenericResponse.Message == nil {
+			break
+		}
+
+		return e.complexity.GenericResponse.Message(childComplexity), true
+
+	case "LoginResponse.token":
+		if e.complexity.LoginResponse.Token == nil {
+			break
+		}
+
+		return e.complexity.LoginResponse.Token(childComplexity), true
+
+	case "LoginResponse.user":
+		if e.complexity.LoginResponse.User == nil {
+			break
+		}
+
+		return e.complexity.LoginResponse.User(childComplexity), true
+
 	case "Mutation.CreateNewUser":
 		if e.complexity.Mutation.CreateNewUser == nil {
 			break
@@ -183,6 +225,66 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateNewUser(childComplexity, args["input"].(model.CreateUser)), true
+
+	case "Mutation.ForgotPassword":
+		if e.complexity.Mutation.ForgotPassword == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_ForgotPassword_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ForgotPassword(childComplexity, args["input"].(model.ForgotPassword)), true
+
+	case "Mutation.Login":
+		if e.complexity.Mutation.Login == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_Login_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.Login)), true
+
+	case "Mutation.ResetPassword":
+		if e.complexity.Mutation.ResetPassword == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_ResetPassword_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ResetPassword(childComplexity, args["input"].(model.ResetPassword)), true
+
+	case "Mutation.VerifyEmail":
+		if e.complexity.Mutation.VerifyEmail == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_VerifyEmail_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.VerifyEmail(childComplexity, args["input"].(model.VerifyOtp)), true
+
+	case "Mutation.VerifyResetOtp":
+		if e.complexity.Mutation.VerifyResetOtp == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_VerifyResetOtp_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.VerifyResetOtp(childComplexity, args["input"].(model.VerifyOtp)), true
 
 	case "Query.GetNews":
 		if e.complexity.Query.GetNews == nil {
@@ -280,6 +382,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ID(childComplexity), true
 
+	case "User.is_otp_verified":
+		if e.complexity.User.IsOtpVerified == nil {
+			break
+		}
+
+		return e.complexity.User.IsOtpVerified(childComplexity), true
+
+	case "User.is_password_reset":
+		if e.complexity.User.IsPasswordReset == nil {
+			break
+		}
+
+		return e.complexity.User.IsPasswordReset(childComplexity), true
+
+	case "User.is_verified":
+		if e.complexity.User.IsVerified == nil {
+			break
+		}
+
+		return e.complexity.User.IsVerified(childComplexity), true
+
 	case "User.picture":
 		if e.complexity.User.Picture == nil {
 			break
@@ -301,13 +424,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.UpdatedAt(childComplexity), true
 
-	case "User.user_id":
-		if e.complexity.User.UserID == nil {
-			break
-		}
-
-		return e.complexity.User.UserID(childComplexity), true
-
 	}
 	return 0, false
 }
@@ -317,6 +433,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateUser,
+		ec.unmarshalInputForgotPassword,
+		ec.unmarshalInputLogin,
+		ec.unmarshalInputResetPassword,
+		ec.unmarshalInputVerifyOtp,
 	)
 	first := true
 
@@ -385,7 +505,9 @@ type User {
   picture: String!
   full_name: String!
     topics: [Topic]
-  user_id: String!
+    is_verified: Boolean!
+    is_otp_verified: Boolean!
+    is_password_reset: Boolean!
   created_at: Timestamp!
   updated_at: Timestamp!
 }
@@ -394,12 +516,22 @@ type Topic {
     topic: String!
 }
 
+input Login {
+    email: String!
+    password: String!
+}
+
+type LoginResponse {
+    user: User!
+    token: String!
+}
+
 input CreateUser {
     email: String!
     picture: String!
     full_name: String!
     topics: [String]
-    user_id: String!
+    password: String!
 }
 
 type Article {
@@ -413,6 +545,10 @@ type Article {
     content: String
 }
 
+type GenericResponse {
+    message: String!
+}
+
 type Source {
     id: String!
     name: String!
@@ -421,6 +557,20 @@ type Response {
     status: String!
     totalResults: Int!
     articles: [Article!]!
+}
+
+input ForgotPassword {
+    email: String!
+}
+
+input VerifyOtp {
+    otp: String!
+}
+
+input ResetPassword {
+    email: String!
+    newPassword: String!
+
 }
 
 type Mutation {
@@ -434,6 +584,14 @@ type Query {
 extend type Query {
     GetNews(query: String!):[Article!]!
     NewsFeed:[Article!]!
+}
+
+extend type Mutation {
+    Login(input: Login!): LoginResponse!
+    ForgotPassword(input: ForgotPassword!): GenericResponse!
+    ResetPassword(input: ResetPassword!): GenericResponse!
+    VerifyEmail(input: VerifyOtp!): GenericResponse!
+    VerifyResetOtp(input: VerifyOtp!): GenericResponse!
 }
 
 `, BuiltIn: false},
@@ -451,6 +609,81 @@ func (ec *executionContext) field_Mutation_CreateNewUser_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCreateUser2newsfeedbackendᚋgraphᚋmodelᚐCreateUser(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_ForgotPassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ForgotPassword
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNForgotPassword2newsfeedbackendᚋgraphᚋmodelᚐForgotPassword(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_Login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.Login
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNLogin2newsfeedbackendᚋgraphᚋmodelᚐLogin(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_ResetPassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ResetPassword
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNResetPassword2newsfeedbackendᚋgraphᚋmodelᚐResetPassword(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_VerifyEmail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.VerifyOtp
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNVerifyOtp2newsfeedbackendᚋgraphᚋmodelᚐVerifyOtp(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_VerifyResetOtp_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.VerifyOtp
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNVerifyOtp2newsfeedbackendᚋgraphᚋmodelᚐVerifyOtp(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -882,6 +1115,160 @@ func (ec *executionContext) fieldContext_Article_content(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _GenericResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.GenericResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GenericResponse_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GenericResponse_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GenericResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LoginResponse_user(ctx context.Context, field graphql.CollectedField, obj *model.LoginResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LoginResponse_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖnewsfeedbackendᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LoginResponse_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LoginResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "_id":
+				return ec.fieldContext_User__id(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "picture":
+				return ec.fieldContext_User_picture(ctx, field)
+			case "full_name":
+				return ec.fieldContext_User_full_name(ctx, field)
+			case "topics":
+				return ec.fieldContext_User_topics(ctx, field)
+			case "is_verified":
+				return ec.fieldContext_User_is_verified(ctx, field)
+			case "is_otp_verified":
+				return ec.fieldContext_User_is_otp_verified(ctx, field)
+			case "is_password_reset":
+				return ec.fieldContext_User_is_password_reset(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LoginResponse_token(ctx context.Context, field graphql.CollectedField, obj *model.LoginResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LoginResponse_token(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LoginResponse_token(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LoginResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_CreateNewUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_CreateNewUser(ctx, field)
 	if err != nil {
@@ -931,8 +1318,12 @@ func (ec *executionContext) fieldContext_Mutation_CreateNewUser(ctx context.Cont
 				return ec.fieldContext_User_full_name(ctx, field)
 			case "topics":
 				return ec.fieldContext_User_topics(ctx, field)
-			case "user_id":
-				return ec.fieldContext_User_user_id(ctx, field)
+			case "is_verified":
+				return ec.fieldContext_User_is_verified(ctx, field)
+			case "is_otp_verified":
+				return ec.fieldContext_User_is_otp_verified(ctx, field)
+			case "is_password_reset":
+				return ec.fieldContext_User_is_password_reset(ctx, field)
 			case "created_at":
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
@@ -949,6 +1340,303 @@ func (ec *executionContext) fieldContext_Mutation_CreateNewUser(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_CreateNewUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_Login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_Login(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Login(rctx, fc.Args["input"].(model.Login))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.LoginResponse)
+	fc.Result = res
+	return ec.marshalNLoginResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐLoginResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_Login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "user":
+				return ec.fieldContext_LoginResponse_user(ctx, field)
+			case "token":
+				return ec.fieldContext_LoginResponse_token(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LoginResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_Login_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_ForgotPassword(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_ForgotPassword(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ForgotPassword(rctx, fc.Args["input"].(model.ForgotPassword))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.GenericResponse)
+	fc.Result = res
+	return ec.marshalNGenericResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_ForgotPassword(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "message":
+				return ec.fieldContext_GenericResponse_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GenericResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_ForgotPassword_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_ResetPassword(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_ResetPassword(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ResetPassword(rctx, fc.Args["input"].(model.ResetPassword))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.GenericResponse)
+	fc.Result = res
+	return ec.marshalNGenericResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_ResetPassword(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "message":
+				return ec.fieldContext_GenericResponse_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GenericResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_ResetPassword_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_VerifyEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_VerifyEmail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().VerifyEmail(rctx, fc.Args["input"].(model.VerifyOtp))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.GenericResponse)
+	fc.Result = res
+	return ec.marshalNGenericResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_VerifyEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "message":
+				return ec.fieldContext_GenericResponse_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GenericResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_VerifyEmail_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_VerifyResetOtp(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_VerifyResetOtp(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().VerifyResetOtp(rctx, fc.Args["input"].(model.VerifyOtp))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.GenericResponse)
+	fc.Result = res
+	return ec.marshalNGenericResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_VerifyResetOtp(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "message":
+				return ec.fieldContext_GenericResponse_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GenericResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_VerifyResetOtp_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -1004,8 +1692,12 @@ func (ec *executionContext) fieldContext_Query_GetUser(ctx context.Context, fiel
 				return ec.fieldContext_User_full_name(ctx, field)
 			case "topics":
 				return ec.fieldContext_User_topics(ctx, field)
-			case "user_id":
-				return ec.fieldContext_User_user_id(ctx, field)
+			case "is_verified":
+				return ec.fieldContext_User_is_verified(ctx, field)
+			case "is_otp_verified":
+				return ec.fieldContext_User_is_otp_verified(ctx, field)
+			case "is_password_reset":
+				return ec.fieldContext_User_is_password_reset(ctx, field)
 			case "created_at":
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
@@ -1784,8 +2476,8 @@ func (ec *executionContext) fieldContext_User_topics(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _User_user_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_user_id(ctx, field)
+func (ec *executionContext) _User_is_verified(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_is_verified(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1798,7 +2490,7 @@ func (ec *executionContext) _User_user_id(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UserID, nil
+		return obj.IsVerified, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1810,19 +2502,107 @@ func (ec *executionContext) _User_user_id(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_user_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_is_verified(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_is_otp_verified(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_is_otp_verified(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsOtpVerified, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_is_otp_verified(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_is_password_reset(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_is_password_reset(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsPasswordReset, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_is_password_reset(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3696,7 +4476,7 @@ func (ec *executionContext) unmarshalInputCreateUser(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"email", "picture", "full_name", "topics", "user_id"}
+	fieldsInOrder := [...]string{"email", "picture", "full_name", "topics", "password"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3735,11 +4515,139 @@ func (ec *executionContext) unmarshalInputCreateUser(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "user_id":
+		case "password":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
-			it.UserID, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputForgotPassword(ctx context.Context, obj interface{}) (model.ForgotPassword, error) {
+	var it model.ForgotPassword
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"email"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj interface{}) (model.Login, error) {
+	var it model.Login
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"email", "password"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputResetPassword(ctx context.Context, obj interface{}) (model.ResetPassword, error) {
+	var it model.ResetPassword
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"email", "newPassword"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "newPassword":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("newPassword"))
+			it.NewPassword, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputVerifyOtp(ctx context.Context, obj interface{}) (model.VerifyOtp, error) {
+	var it model.VerifyOtp
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"otp"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "otp":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("otp"))
+			it.Otp, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3831,6 +4739,69 @@ func (ec *executionContext) _Article(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var genericResponseImplementors = []string{"GenericResponse"}
+
+func (ec *executionContext) _GenericResponse(ctx context.Context, sel ast.SelectionSet, obj *model.GenericResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, genericResponseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GenericResponse")
+		case "message":
+
+			out.Values[i] = ec._GenericResponse_message(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var loginResponseImplementors = []string{"LoginResponse"}
+
+func (ec *executionContext) _LoginResponse(ctx context.Context, sel ast.SelectionSet, obj *model.LoginResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, loginResponseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LoginResponse")
+		case "user":
+
+			out.Values[i] = ec._LoginResponse_user(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "token":
+
+			out.Values[i] = ec._LoginResponse_token(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3854,6 +4825,51 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_CreateNewUser(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Login":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_Login(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "ForgotPassword":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_ForgotPassword(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "ResetPassword":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_ResetPassword(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "VerifyEmail":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_VerifyEmail(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "VerifyResetOtp":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_VerifyResetOtp(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -4128,9 +5144,23 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._User_topics(ctx, field, obj)
 
-		case "user_id":
+		case "is_verified":
 
-			out.Values[i] = ec._User_user_id(ctx, field, obj)
+			out.Values[i] = ec._User_is_verified(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "is_otp_verified":
+
+			out.Values[i] = ec._User_is_otp_verified(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "is_password_reset":
+
+			out.Values[i] = ec._User_is_password_reset(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -4552,6 +5582,25 @@ func (ec *executionContext) unmarshalNCreateUser2newsfeedbackendᚋgraphᚋmodel
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNForgotPassword2newsfeedbackendᚋgraphᚋmodelᚐForgotPassword(ctx context.Context, v interface{}) (model.ForgotPassword, error) {
+	res, err := ec.unmarshalInputForgotPassword(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGenericResponse2newsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx context.Context, sel ast.SelectionSet, v model.GenericResponse) graphql.Marshaler {
+	return ec._GenericResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGenericResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx context.Context, sel ast.SelectionSet, v *model.GenericResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GenericResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4580,6 +5629,30 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNLogin2newsfeedbackendᚋgraphᚋmodelᚐLogin(ctx context.Context, v interface{}) (model.Login, error) {
+	res, err := ec.unmarshalInputLogin(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNLoginResponse2newsfeedbackendᚋgraphᚋmodelᚐLoginResponse(ctx context.Context, sel ast.SelectionSet, v model.LoginResponse) graphql.Marshaler {
+	return ec._LoginResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNLoginResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐLoginResponse(ctx context.Context, sel ast.SelectionSet, v *model.LoginResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._LoginResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNResetPassword2newsfeedbackendᚋgraphᚋmodelᚐResetPassword(ctx context.Context, v interface{}) (model.ResetPassword, error) {
+	res, err := ec.unmarshalInputResetPassword(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNSource2ᚖnewsfeedbackendᚋgraphᚋmodelᚐSource(ctx context.Context, sel ast.SelectionSet, v *model.Source) graphql.Marshaler {
@@ -4634,6 +5707,11 @@ func (ec *executionContext) marshalNUser2ᚖnewsfeedbackendᚋgraphᚋmodelᚐUs
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNVerifyOtp2newsfeedbackendᚋgraphᚋmodelᚐVerifyOtp(ctx context.Context, v interface{}) (model.VerifyOtp, error) {
+	res, err := ec.unmarshalInputVerifyOtp(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

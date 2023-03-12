@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"log"
 	"newsfeedbackend/graph/generated"
 	"newsfeedbackend/graph/model"
 	"newsfeedbackend/handlers"
@@ -20,9 +21,9 @@ func (r *mutationResolver) CreateNewUser(ctx context.Context, input model.Create
 		return nil, err
 
 	}
-	newUser := handlers.Handler{}.NewUser(input)
+	newUser, err := handlers.Handler{}.NewUser(input)
 	if newUser == nil {
-		err := errors.New("unable to create user")
+		//err := errors.New("unable to create user")
 		return nil, err
 	}
 
@@ -35,12 +36,70 @@ func (r *mutationResolver) CreateNewUser(ctx context.Context, input model.Create
 	}
 
 	user := &model.User{
-		Email:  newUser.Email,
-		UserID: newUser.UserId,
-		Topics: topicsFromDB,
-		ID:     newUser.ID.String(),
+		Email:           newUser.Email,
+		IsVerified:      newUser.IsVerified,
+		IsOtpVerified:   newUser.IsOtpVerified,
+		IsPasswordReset: newUser.IsPasswordReset,
+		Picture:         newUser.Picture,
+		Topics:          topicsFromDB,
+		ID:              newUser.ID.String(),
 	}
 	return user, nil
+}
+
+// Login is the resolver for the Login field.
+func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.LoginResponse, error) {
+	response, err := handlers.Handler{}.Login(input, r.Env)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+// ForgotPassword is the resolver for the ForgotPassword field.
+func (r *mutationResolver) ForgotPassword(ctx context.Context, input model.ForgotPassword) (*model.GenericResponse, error) {
+	response, err := handlers.Handler{}.ForgotPassword(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+// ResetPassword is the resolver for the ResetPassword field.
+func (r *mutationResolver) ResetPassword(ctx context.Context, input model.ResetPassword) (*model.GenericResponse, error) {
+	response, err := handlers.Handler{}.ResetPassword(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+// VerifyEmail is the resolver for the VerifyEmail field.
+func (r *mutationResolver) VerifyEmail(ctx context.Context, input model.VerifyOtp) (*model.GenericResponse, error) {
+	response, err := handlers.Handler{}.VerifyEmail(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+// VerifyResetOtp is the resolver for the VerifyResetOtp field.
+func (r *mutationResolver) VerifyResetOtp(ctx context.Context, input model.VerifyOtp) (*model.GenericResponse, error) {
+	response, err := handlers.Handler{}.VerifyResetOtp(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
 // GetUser is the resolver for the GetUser field.
@@ -53,8 +112,9 @@ func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 	if er != nil {
 		return nil, er
 	}
-	email := sub.Email
-	getUser := handlers.Handler{}.GetUserByEmail(email)
+	id := sub
+	log.Print(id)
+	getUser := handlers.Handler{}.GetUserById(id)
 
 	if getUser == nil {
 		err := errors.New("unable to fetch user")
@@ -70,14 +130,16 @@ func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 	}
 
 	user := &model.User{
-		Email:     getUser.Email,
-		UserID:    getUser.UserId,
-		Picture:   getUser.Picture,
-		FullName:  getUser.FullName,
-		ID:        getUser.ID.String(),
-		Topics:    topicsFromDB,
-		UpdatedAt: getUser.UpdatedAt,
-		CreatedAt: getUser.CreatedAt,
+		Email:           getUser.Email,
+		IsVerified:      getUser.IsVerified,
+		IsOtpVerified:   getUser.IsOtpVerified,
+		IsPasswordReset: getUser.IsPasswordReset,
+		Picture:         getUser.Picture,
+		FullName:        getUser.FullName,
+		ID:              getUser.ID.String(),
+		Topics:          topicsFromDB,
+		UpdatedAt:       getUser.UpdatedAt,
+		CreatedAt:       getUser.CreatedAt,
 	}
 
 	return user, nil
@@ -102,9 +164,9 @@ func (r *queryResolver) NewsFeed(ctx context.Context) ([]*model.Article, error) 
 	if er != nil {
 		return nil, er
 	}
-	email := sub.Email
+	id := sub
 
-	newsFeed, er := handlers.Handler{}.NewsFeed(r.Env, email, ctx)
+	newsFeed, er := handlers.Handler{}.NewsFeed(r.Env, id, ctx)
 	if er != nil {
 		return nil, er
 	}

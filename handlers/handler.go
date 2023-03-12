@@ -14,35 +14,241 @@ import (
 	"newsfeedbackend/database/models"
 	"newsfeedbackend/graph/model"
 	"newsfeedbackend/redis"
+	"newsfeedbackend/utils"
+	"time"
 )
 
 var httpClient = resty.New()
 
 type Handler struct{}
 
-func (h Handler) NewUser(input model.CreateUser) *models.User {
-	var topics []models.Topic
-	topicsArray := input.Topics
-	for i := 0; i < len(topicsArray); i++ {
-		topics = append(topics, models.Topic{
-			Topic: *topicsArray[i],
-		})
+// NewUser register new user
+func (h Handler) NewUser(input model.CreateUser) (*models.User, error) {
+	user := &models.User{}
+
+	e := mgm.Coll(user).First(bson.M{"email": input.Email}, user)
+
+	if e != nil {
+		var topics []models.Topic
+		topicsArray := input.Topics
+		for i := 0; i < len(topicsArray); i++ {
+			topics = append(topics, models.Topic{
+				Topic: *topicsArray[i],
+			})
+		}
+		hashPassword, e := utils.GenerateFromPassword(input.Password)
+		if e != nil {
+			errMessage := errors.New("an error occurred")
+			return nil, errMessage
+		}
+		otp := utils.GenerateOTP()
+		expireTime := time.Now().Add(10 * time.Minute)
+		newUser := models.User{
+			Email:         input.Email,
+			FullName:      input.FullName,
+			IsVerified:    false,
+			Otp:           otp,
+			OtpExpireTime: expireTime,
+			Password:      hashPassword,
+			Picture:       input.Picture,
+			Topics:        topics,
+		}
+		err := mgm.Coll(&models.User{}).Create(&newUser)
+
+		if err != nil {
+			errMessage := errors.New("an error occurred")
+			return nil, errMessage
+		}
+
+		return &newUser, nil
 	}
-	newUser := models.User{
-		Email:    input.Email,
-		FullName: input.FullName,
-		UserId:   input.UserID,
-		Picture:  input.Picture,
-		Topics:   topics,
-	}
-	err := mgm.Coll(&models.User{}).Create(&newUser)
+	errMessage := errors.New("user already exist")
+	return nil, errMessage
+
+}
+
+// Login login
+func (h Handler) Login(input model.Login, env *config.Env) (*model.LoginResponse, error) {
+	user := &models.User{}
+
+	err := mgm.Coll(user).First(bson.M{"email": input.Email}, user)
 
 	if err != nil {
-		return nil
+		errMessage := errors.New("invalid credentials")
+		return nil, errMessage
 	}
 
-	return &newUser
+	//if user.IsVerified == false {
+	//	errMessage := errors.New("account not verified")
+	//	return nil, errMessage
+	//}
 
+	passwordMatch, e := utils.ComparePasswordAndHash(input.Password, user.Password)
+
+	if e != nil {
+		errMessage := errors.New("an error occurred")
+		return nil, errMessage
+	}
+
+	if passwordMatch == false {
+		errMessage := errors.New("invalid credentials")
+		return nil, errMessage
+	}
+	token := utils.GenerateToken(user.ID.Hex(), env.JwtKey)
+
+	var topics []*model.Topic
+	topicsArray := user.Topics
+	for i := 0; i < len(topicsArray); i++ {
+		topics = append(topics, &model.Topic{
+			Topic: topicsArray[i].Topic,
+		})
+	}
+
+	response := &model.LoginResponse{
+		User: &model.User{
+			Email:           user.Email,
+			FullName:        user.FullName,
+			ID:              user.ID.Hex(),
+			IsPasswordReset: user.IsPasswordReset,
+			IsOtpVerified:   user.IsOtpVerified,
+			IsVerified:      user.IsVerified,
+			Topics:          topics,
+			UpdatedAt:       user.UpdatedAt,
+			CreatedAt:       user.CreatedAt,
+			Picture:         user.Picture,
+		},
+		Token: token,
+	}
+
+	return response, nil
+
+}
+
+// ForgotPassword user forgot password
+func (h Handler) ForgotPassword(input model.ForgotPassword) (*model.GenericResponse, error) {
+	user := &models.User{}
+
+	err := mgm.Coll(user).First(bson.M{"email": input.Email}, user)
+
+	if err != nil {
+		errMessage := errors.New("user not found")
+		return nil, errMessage
+	}
+	otp := utils.GenerateOTP()
+	expireTime := time.Now().Add(10 * time.Minute)
+
+	er := mgm.Coll(user).Update(&models.User{Otp: otp, OtpExpireTime: expireTime, IsPasswordReset: true})
+
+	if er != nil {
+		errMessage := errors.New("an error occurred")
+		return nil, errMessage
+	}
+
+	response := &model.GenericResponse{
+		Message: "password reset initiated",
+	}
+	return response, nil
+
+}
+
+func (h Handler) ResetPassword(input model.ResetPassword) (*model.GenericResponse, error) {
+	user := &models.User{}
+
+	err := mgm.Coll(user).First(bson.M{"email": input.Email}, user)
+
+	if err != nil {
+		errMessage := errors.New("password reset failed")
+		return nil, errMessage
+	}
+	hasPassword, e := utils.GenerateFromPassword(input.NewPassword)
+
+	if e != nil {
+		errMessage := errors.New("an error occurred")
+		return nil, errMessage
+	}
+	er := mgm.Coll(user).Update(&models.User{IsPasswordReset: false, Password: hasPassword})
+
+	if er != nil {
+		errMessage := errors.New("an error occurred")
+		return nil, errMessage
+	}
+
+	response := &model.GenericResponse{
+		Message: "password reset successful",
+	}
+
+	return response, nil
+
+}
+
+func (h Handler) VerifyEmail(input model.VerifyOtp) (*model.GenericResponse, error) {
+	user := &models.User{}
+
+	err := mgm.Coll(user).First(bson.M{"otp": input.Otp}, user)
+
+	if err != nil {
+		errMessage := errors.New("invalid token")
+		return nil, errMessage
+	}
+
+	if user.IsVerified == true {
+		errMessage := errors.New("account already verified")
+		return nil, errMessage
+	}
+
+	// check if otp expired
+	if user.OtpExpireTime.After(time.Now()) {
+		errMessage := errors.New("otp expired")
+		return nil, errMessage
+	}
+
+	er := mgm.Coll(user).Update(&models.User{IsVerified: true, Otp: ""})
+
+	if er != nil {
+		errMessage := errors.New("an error occurred")
+		return nil, errMessage
+	}
+
+	response := &model.GenericResponse{
+		Message: "email verification successful",
+	}
+
+	return response, nil
+}
+
+func (h Handler) VerifyResetOtp(input model.VerifyOtp) (*model.GenericResponse, error) {
+	user := &models.User{}
+
+	err := mgm.Coll(user).First(bson.M{"otp": input.Otp}, user)
+
+	if err != nil {
+		errMessage := errors.New("invalid token")
+		return nil, errMessage
+	}
+
+	if user.IsPasswordReset == false {
+		errMessage := errors.New("reset password not initiated")
+		return nil, errMessage
+	}
+
+	// check if otp expired
+	if user.OtpExpireTime.After(time.Now()) {
+		errMessage := errors.New("otp expired")
+		return nil, errMessage
+	}
+
+	er := mgm.Coll(user).Update(&models.User{IsVerified: true, Otp: ""})
+
+	if er != nil {
+		errMessage := errors.New("an error occurred")
+		return nil, errMessage
+	}
+
+	response := &model.GenericResponse{
+		Message: "otp verification successful",
+	}
+
+	return response, nil
 }
 
 func (h Handler) GetUser(userId string) *models.User {
@@ -67,10 +273,10 @@ func (h Handler) GetUserByEmail(email string) *models.User {
 	return user
 }
 
-func (h Handler) GetUserByAuth0Id(id string) *models.User {
+func (h Handler) GetUserById(id interface{}) *models.User {
 	user := &models.User{}
 
-	err := mgm.Coll(user).First(bson.M{"userid": id}, user)
+	err := mgm.Coll(user).FindByID(id, user)
 
 	if err != nil {
 		return nil
@@ -120,10 +326,10 @@ func (h Handler) FetchNews(query string, env *config.Env, ctx context.Context) (
 	}
 
 }
-func (h Handler) NewsFeed(env *config.Env, email string, ctx context.Context) ([]*model.Article, error) {
+func (h Handler) NewsFeed(env *config.Env, id interface{}, ctx context.Context) ([]*model.Article, error) {
 	user := &models.User{}
 
-	err := mgm.Coll(user).First(bson.M{"email": email}, user)
+	err := mgm.Coll(user).FindByID(id, user)
 
 	if err != nil {
 		er := errors.New("user not found")

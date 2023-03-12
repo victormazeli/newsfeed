@@ -1,4 +1,4 @@
-package utils
+package utils_old
 
 import (
 	"context"
@@ -39,7 +39,7 @@ func ValidateToken(bearerToken string, env *config.Env) (*model.User, error) {
 		return nil, ErrInvalidToken
 	}
 
-	subValue, ok := token.Get("email")
+	subValue, ok := token.Get("sub")
 	if !ok {
 		log.Print("error no sub found")
 		return nil, ErrInvalidToken
@@ -61,6 +61,7 @@ func ValidateToken(bearerToken string, env *config.Env) (*model.User, error) {
 	//payload["sub"] = struct {
 	//	UserId string `json:"user_id"`
 	//}{sub}
+	log.Print(sub)
 
 	payload := &model.User{
 		Email: sub,
