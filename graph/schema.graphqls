@@ -5,93 +5,92 @@ type User {
   email: String!
   picture: String!
   full_name: String!
-    topics: [Topic]
-    is_verified: Boolean!
-    is_otp_verified: Boolean!
-    is_password_reset: Boolean!
+  topics: [Topic]
+  is_verified: Boolean!
+  is_otp_verified: Boolean!
+  is_password_reset: Boolean!
   created_at: Timestamp!
   updated_at: Timestamp!
 }
 
 type Topic {
-    topic: String!
+  topic: String!
 }
 
 input Login {
-    email: String!
-    password: String!
+  email: String!
+  password: String!
 }
 
 type LoginResponse {
-    user: User!
-    token: String!
+  user: User!
+  token: String!
 }
 
 input CreateUser {
-    email: String!
-    picture: String!
-    full_name: String!
-    topics: [String]
-    password: String!
+  email: String!
+  picture: String!
+  full_name: String!
+  topics: [String]
+  password: String!
 }
 
 type Article {
-    author: String!
-    source: Source!
-    title: String!
-    description: String!
-    url: String!
-    urlToImage: String!
-    publishedAt: String!
-    content: String
+  author: String!
+  source: Source!
+  title: String!
+  description: String!
+  url: String!
+  urlToImage: String!
+  publishedAt: String!
+  content: String
 }
 
 type GenericResponse {
-    message: String!
+  message: String!
 }
 
 type Source {
-    id: String!
-    name: String!
+  id: String!
+  name: String!
 }
 type Response {
-    status: String!
-    totalResults: Int!
-    articles: [Article!]!
+  status: String!
+  totalResults: Int!
+  articles: [Article!]!
 }
 
 input ForgotPassword {
-    email: String!
+  email: String!
 }
 
 input VerifyOtp {
-    otp: String!
+  otp: String!
 }
 
 input ResetPassword {
-    email: String!
-    newPassword: String!
+  email: String!
+  newPassword: String!
 
 }
 
 type Mutation {
-    CreateNewUser(input: CreateUser!): User!
+  CreateNewUser(input: CreateUser!): User!
 }
 
 type Query {
-    GetUser: User!
+  GetUser: User!
 }
 
 extend type Query {
-    GetNews(query: String!):[Article!]!
-    NewsFeed:[Article!]!
+  GetNews(query: String!):[Article!]!
+  NewsFeed:[Article!]!
 }
 
 extend type Mutation {
-    Login(input: Login!): LoginResponse!
-    ForgotPassword(input: ForgotPassword!): GenericResponse!
-    ResetPassword(input: ResetPassword!): GenericResponse!
-    VerifyEmail(input: VerifyOtp!): GenericResponse!
-    VerifyResetOtp(input: VerifyOtp!): GenericResponse!
+  Login(input: Login!): LoginResponse!
+  ForgotPassword(input: ForgotPassword!): GenericResponse!
+  ResetPassword(input: ResetPassword!): GenericResponse!
+  VerifyEmail(input: VerifyOtp!): GenericResponse!
+  VerifyResetOtp(input: VerifyOtp!): GenericResponse!
 }
-

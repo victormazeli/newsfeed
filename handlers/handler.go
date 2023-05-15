@@ -354,3 +354,32 @@ func (h Handler) NewsFeed(env *config.Env, id interface{}, ctx context.Context) 
 	return nil, er
 
 }
+
+//func (h Handler) AskChatGPT() {
+//	c := openai.NewClient(env.OpenAiKey)
+//	//ctx := context.Background()
+//
+//	req := openai.CompletionRequest{
+//		Model:            openai.GPT3TextDavinci003,
+//		MaxTokens:        100,
+//		Temperature:      0.3,
+//		TopP:             1.0,
+//		FrequencyPenalty: 0.0,
+//		PresencePenalty:  0.0,
+//		Prompt:           fmt.Sprintf("Translate from %s to %s: %s", input.LanguageFrom, input.LanguageTo, input.Text),
+//	}
+//	resp, err := c.CreateCompletion(ctx, req)
+//	if err != nil {
+//		fmt.Printf("Completion error: %v\n", err)
+//		err := errors.New("operation failed")
+//		return nil, err
+//	}
+//	translatedText := resp.Choices[0].Text
+//	cleanedText := strings.ReplaceAll(translatedText, "\n", "")
+//	response := &model.TranslationResponse{
+//		TranslatedText: &cleanedText,
+//	}
+//	//fmt.Println(resp.Choices[0].Text)
+//
+//	return response, nil
+//}
