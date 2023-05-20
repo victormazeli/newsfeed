@@ -9,7 +9,7 @@ func GenerateOTPEmailTemplate(otp string) string {
 		// Theme: new(Default)
 		Product: hermes.Product{
 			// Appears in header & footer of e-mails
-			Name: "AuthCentral",
+			Name: "News Feed",
 			Link: "https://example-hermes.com/",
 			// Optional product logo
 			Logo: "http://www.duchess-france.org/wp-content/uploads/2016/01/gopher.png",
@@ -20,11 +20,11 @@ func GenerateOTPEmailTemplate(otp string) string {
 		Body: hermes.Body{
 			Name: "",
 			Intros: []string{
-				"Welcome to Auth Central! We're very excited to have you on board.",
+				"Welcome to News Feed! We're very excited to have you on board.",
 			},
 			Actions: []hermes.Action{
 				{
-					Instructions: "To get started with Auth Central, please use the OTP code to verify your email:",
+					Instructions: "To get started with News Feed, please use the OTP code to verify your email:",
 					InviteCode:   otp,
 				},
 			},

@@ -23,7 +23,7 @@ var httpClient = resty.New()
 type Handler struct{}
 
 // NewUser register new user
-func (h Handler) NewUser(input model.CreateUser) (*models.User, error) {
+func (h Handler) NewUser(input model.CreateUser, env *config.Env) (*models.User, error) {
 	user := &models.User{}
 
 	e := mgm.Coll(user).First(bson.M{"email": input.Email}, user)
@@ -59,6 +59,11 @@ func (h Handler) NewUser(input model.CreateUser) (*models.User, error) {
 			errMessage := errors.New("an error occurred")
 			return nil, errMessage
 		}
+
+		subject := "Registration"
+		body := utils.GenerateOTPEmailTemplate(otp)
+		res, _ := utils.SendEmail(env, input.Email, body, subject)
+		log.Print("email sent successfully", res)
 
 		return &newUser, nil
 	}

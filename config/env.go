@@ -16,6 +16,8 @@ type Env struct {
 	AuthAudience   string `mapstructure:"AUTH_AUDIENCE"`
 	JwtKey         string `mapstructure:"JWT_KEY"`
 	RedisAddr      string `mapstructure:"REDIS_ADDR"`
+	MailGunDomain  string `mapstructure:"MAILGUN_DOMAIN"`
+	MailGunApiKey  string `mapstructure:"MAILGUN_API_KEY"`
 }
 
 // NewEnv we use viper as our configuration tool to read and load our configurations from env file

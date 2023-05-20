@@ -21,7 +21,7 @@ func (r *mutationResolver) CreateNewUser(ctx context.Context, input model.Create
 		return nil, err
 
 	}
-	newUser, err := handlers.Handler{}.NewUser(input)
+	newUser, err := handlers.Handler{}.NewUser(input, r.Env)
 	if newUser == nil {
 		//err := errors.New("unable to create user")
 		return nil, err
