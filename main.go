@@ -1,8 +1,8 @@
 package main
 
 import (
+	"context"
 	"flag"
-	"fmt"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
@@ -12,21 +12,13 @@ import (
 	"newsfeedbackend/graph/generated"
 	"newsfeedbackend/middlewares"
 	"newsfeedbackend/redis"
+	"newsfeedbackend/utils"
 )
-
-/*
-This is the entry file to the application, here we created the graphql server
-*/
 
 const defaultPort = "8080"
 
 // Defining the Graphql handler
-func graphqlHandler(env *config.Env) gin.HandlerFunc {
-	// pass the env to the resolver since the resolver instance is where we can initialize dependencies
-	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
-		Env: env,
-	}}))
-
+func graphqlHandler(env *config.Env, h *handler.Server) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
@@ -42,32 +34,40 @@ func playgroundHandler() gin.HandlerFunc {
 }
 
 func main() {
-	// toggle between different environment using command line
+	// Toggle between different environments using command line
 	environment := flag.String("e", "development", "")
-	flag.Usage = func() {
-		fmt.Println("Usage: server -e {mode}")
-	}
 	flag.Parse()
-	//
+
+	// Initialize the application
 	app := config.App(*environment)
 	env := app.Env
 	port := env.ServerPort
 	if port == "" {
 		port = defaultPort
 	}
-	// initiate database connection
+
+	// Initialize database connection
 	database.Init(env)
+
+	// Initialize redis service
 	redis.NewsCacheService{}.Setup(env)
-	//srv := handler.NewDefaultServer()
-	//
-	//http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	//http.Handle("/query", middlewares.EnsureValidToken(env)(srv))
-	//
-	//log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	//log.Fatal(http.ListenAndServe(":"+port, nil))
+
+	// Initialize cron job
+	utils.InitCron(context.Background(), env)
+
+	// Create the GraphQL handler
+	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
+		Resolvers: &graph.Resolver{
+			Env: env,
+		},
+	}))
+
+	// Create the Gin router
 	r := gin.Default()
 	r.Use(middlewares.GinContextToContextMiddleware())
-	r.POST("/query", graphqlHandler(env))
+	r.POST("/query", graphqlHandler(env, h))
 	r.GET("/", playgroundHandler())
+
+	// Start the server
 	r.Run(":" + port)
 }

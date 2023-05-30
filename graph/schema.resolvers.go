@@ -6,14 +6,12 @@ package graph
 import (
 	"context"
 	"errors"
-	"log"
 	"newsfeedbackend/graph/generated"
 	"newsfeedbackend/graph/model"
 	"newsfeedbackend/handlers"
 	"newsfeedbackend/middlewares"
 )
 
-// CreateNewUser is the resolver for the CreateNewUser field.
 func (r *mutationResolver) CreateNewUser(ctx context.Context, input model.CreateUser) (*model.User, error) {
 	checkUser := handlers.Handler{}.GetUserByEmail(input.Email)
 	if checkUser != nil {
@@ -27,29 +25,31 @@ func (r *mutationResolver) CreateNewUser(ctx context.Context, input model.Create
 		return nil, err
 	}
 
-	var topicsFromDB []*model.Topic
-	for _, t := range newUser.Topics {
-		item := model.Topic{
-			Topic: t.Topic,
-		}
-		topicsFromDB = append(topicsFromDB, &item)
-	}
+	//var topicsFromDB []*model.Topic
+	//for _, t := range newUser.Topics {
+	//	item := model.Topic{
+	//		Topic: t.Topic,
+	//	}
+	//	topicsFromDB = append(topicsFromDB, &item)
+	//}
 
 	user := &model.User{
-		Email:           newUser.Email,
-		IsVerified:      newUser.IsVerified,
-		IsOtpVerified:   newUser.IsOtpVerified,
-		IsPasswordReset: newUser.IsPasswordReset,
-		Picture:         newUser.Picture,
-		Topics:          topicsFromDB,
-		ID:              newUser.ID.String(),
+		Email:           &newUser.Email,
+		IsVerified:      &newUser.IsVerified,
+		IsOtpVerified:   &newUser.IsOtpVerified,
+		IsPasswordReset: &newUser.IsPasswordReset,
+		Picture:         &newUser.Picture,
+		Topics:          newUser.Topics,
+		FullName:        &newUser.FullName,
+		ID:              newUser.ID.Hex(),
+		CreatedAt:       newUser.CreatedAt.String(),
+		UpdatedAt:       newUser.UpdatedAt.String(),
 	}
 	return user, nil
 }
 
-// Login is the resolver for the Login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.LoginResponse, error) {
-	response, err := handlers.Handler{}.Login(input, r.Env)
+	response, err := handlers.Handler{}.Login(input, r.Env, ctx)
 
 	if err != nil {
 		return nil, err
@@ -58,9 +58,27 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 	return response, nil
 }
 
-// ForgotPassword is the resolver for the ForgotPassword field.
+func (r *mutationResolver) CompleteRegistration(ctx context.Context, input model.CompleteRegistration) (*model.GenericResponse, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sub, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+
+	response, e := handlers.Handler{}.CompleteRegistration(input, sub, ctx)
+
+	if e != nil {
+		return nil, e
+	}
+
+	return response, nil
+}
+
 func (r *mutationResolver) ForgotPassword(ctx context.Context, input model.ForgotPassword) (*model.GenericResponse, error) {
-	response, err := handlers.Handler{}.ForgotPassword(input)
+	response, err := handlers.Handler{}.ForgotPassword(input, r.Env, ctx)
 
 	if err != nil {
 		return nil, err
@@ -69,9 +87,18 @@ func (r *mutationResolver) ForgotPassword(ctx context.Context, input model.Forgo
 	return response, nil
 }
 
-// ResetPassword is the resolver for the ResetPassword field.
+func (r *mutationResolver) GoogleLogin(ctx context.Context, input model.GoogleAuth) (*model.LoginResponse, error) {
+	response, err := handlers.Handler{}.GoogleLogin(input, r.Env, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
 func (r *mutationResolver) ResetPassword(ctx context.Context, input model.ResetPassword) (*model.GenericResponse, error) {
-	response, err := handlers.Handler{}.ResetPassword(input)
+	response, err := handlers.Handler{}.ResetPassword(input, ctx)
 
 	if err != nil {
 		return nil, err
@@ -80,9 +107,8 @@ func (r *mutationResolver) ResetPassword(ctx context.Context, input model.ResetP
 	return response, nil
 }
 
-// VerifyEmail is the resolver for the VerifyEmail field.
 func (r *mutationResolver) VerifyEmail(ctx context.Context, input model.VerifyOtp) (*model.GenericResponse, error) {
-	response, err := handlers.Handler{}.VerifyEmail(input)
+	response, err := handlers.Handler{}.VerifyEmail(input, ctx)
 
 	if err != nil {
 		return nil, err
@@ -91,9 +117,8 @@ func (r *mutationResolver) VerifyEmail(ctx context.Context, input model.VerifyOt
 	return response, nil
 }
 
-// VerifyResetOtp is the resolver for the VerifyResetOtp field.
 func (r *mutationResolver) VerifyResetOtp(ctx context.Context, input model.VerifyOtp) (*model.GenericResponse, error) {
-	response, err := handlers.Handler{}.VerifyResetOtp(input)
+	response, err := handlers.Handler{}.VerifyResetOtp(input, ctx)
 
 	if err != nil {
 		return nil, err
@@ -102,7 +127,83 @@ func (r *mutationResolver) VerifyResetOtp(ctx context.Context, input model.Verif
 	return response, nil
 }
 
-// GetUser is the resolver for the GetUser field.
+func (r *mutationResolver) Logout(ctx context.Context, input model.Logout) (*model.GenericResponse, error) {
+	response, err := handlers.Handler{}.Logout(input, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *mutationResolver) AskKora(ctx context.Context, input model.PromptContent) (*model.PromptResponse, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	_, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+
+	response, err := handlers.Handler{}.AskChatGPT(input, r.Env, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *mutationResolver) SaveNews(ctx context.Context, newsID string) (*bool, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sub, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+
+	response, err := handlers.Handler{}.SaveNews(newsID, sub, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *mutationResolver) LikeNews(ctx context.Context, newsID string) (*bool, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sub, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+
+	response, err := handlers.Handler{}.LikeNews(sub, newsID, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *mutationResolver) ResendOtp(ctx context.Context, email string) (*model.GenericResponse, error) {
+	response, err := handlers.Handler{}.ResendOtp(email, ctx, r.Env)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
 func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 	gc, err := middlewares.GinContextFromContext(ctx)
 	if err != nil {
@@ -113,7 +214,7 @@ func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 		return nil, er
 	}
 	id := sub
-	log.Print(id)
+	//log.Print(id)
 	getUser := handlers.Handler{}.GetUserById(id)
 
 	if getUser == nil {
@@ -121,41 +222,31 @@ func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 		return nil, err
 	}
 
-	var topicsFromDB []*model.Topic
-	for _, t := range getUser.Topics {
-		item := model.Topic{
-			Topic: t.Topic,
-		}
-		topicsFromDB = append(topicsFromDB, &item)
-	}
+	//var topicsFromDB []*model.Topic
+	//for _, t := range getUser.Topics {
+	//	item := model.Topic{
+	//		Topic: t.Topic,
+	//	}
+	//	topicsFromDB = append(topicsFromDB, &item)
+	//}
 
 	user := &model.User{
-		Email:           getUser.Email,
-		IsVerified:      getUser.IsVerified,
-		IsOtpVerified:   getUser.IsOtpVerified,
-		IsPasswordReset: getUser.IsPasswordReset,
-		Picture:         getUser.Picture,
-		FullName:        getUser.FullName,
-		ID:              getUser.ID.String(),
-		Topics:          topicsFromDB,
-		UpdatedAt:       getUser.UpdatedAt,
-		CreatedAt:       getUser.CreatedAt,
+		Email:           &getUser.Email,
+		IsVerified:      &getUser.IsVerified,
+		IsOtpVerified:   &getUser.IsOtpVerified,
+		IsPasswordReset: &getUser.IsPasswordReset,
+		Picture:         &getUser.Picture,
+		FullName:        &getUser.FullName,
+		ID:              getUser.ID.Hex(),
+		Topics:          getUser.Topics,
+		UpdatedAt:       getUser.UpdatedAt.String(),
+		CreatedAt:       getUser.CreatedAt.String(),
 	}
 
 	return user, nil
 }
 
-// GetNews is the resolver for the GetNews field.
-func (r *queryResolver) GetNews(ctx context.Context, query string) ([]*model.Article, error) {
-	getNews, err := handlers.Handler{}.FetchNews(query, r.Env, ctx)
-	if err != nil {
-		return nil, err
-	}
-	return getNews, nil
-}
-
-// NewsFeed is the resolver for the NewsFeed field.
-func (r *queryResolver) NewsFeed(ctx context.Context) ([]*model.Article, error) {
+func (r *queryResolver) GetLatestAndTrendingNews(ctx context.Context, query model.NewsQuery) ([]*model.Article, error) {
 	gc, err := middlewares.GinContextFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -165,12 +256,81 @@ func (r *queryResolver) NewsFeed(ctx context.Context) ([]*model.Article, error) 
 		return nil, er
 	}
 	id := sub
+	response, err := handlers.Handler{}.NewsFeed(id, query, ctx)
 
-	newsFeed, er := handlers.Handler{}.NewsFeed(r.Env, id, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *queryResolver) GetNewsSources(ctx context.Context) ([]*model.Source, error) {
+	response, err := handlers.Handler{}.FetchSources()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *queryResolver) SeedNewsSources(ctx context.Context) ([]*model.Source, error) {
+	response, err := handlers.Handler{}.SeedSources(ctx, r.Env)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *queryResolver) GetNewsCategories(ctx context.Context) ([]*model.Category, error) {
+	response, err := handlers.Handler{}.FetCategories()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *queryResolver) GetSingleNews(ctx context.Context, newsID string) (*model.Article, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sub, er := middlewares.Auth(gc, r.Env)
 	if er != nil {
 		return nil, er
 	}
-	return newsFeed, nil
+	id := sub
+	response, err := handlers.Handler{}.GetNewsById(newsID, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *queryResolver) GetSavedNews(ctx context.Context) ([]*model.Article, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sub, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+	id := sub
+	response, err := handlers.Handler{}.FetchSavedNews(id, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

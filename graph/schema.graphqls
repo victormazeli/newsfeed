@@ -2,48 +2,78 @@ scalar Timestamp
 ### User Queries ###
 type User {
   _id: ID!
-  email: String!
-  picture: String!
-  full_name: String!
-  topics: [Topic]
-  is_verified: Boolean!
-  is_otp_verified: Boolean!
-  is_password_reset: Boolean!
+  email: String
+  picture: String
+  full_name: String
+  topics: [String]
+  is_verified: Boolean
+  is_otp_verified: Boolean
+  is_password_reset: Boolean
   created_at: Timestamp!
   updated_at: Timestamp!
 }
 
-type Topic {
-  topic: String!
-}
+#type Topic {
+#  topic: String!
+#}
 
 input Login {
   email: String!
   password: String!
 }
 
+input Logout {
+  token: String!
+}
+
+input GoogleAuth {
+  access_token: String!
+}
+
+type GoogleAuthModel {
+  sub: String
+  name: String
+  given_name: String
+  family_name: String
+  email: String
+  picture: String
+  email_verified: Boolean
+  locale: String
+}
+
+input promptContent {
+  content: String
+}
+
+type promptResponse {
+  result: String
+}
+
+
 type LoginResponse {
-  user: User!
   token: String!
 }
 
 input CreateUser {
   email: String!
-  picture: String!
   full_name: String!
-  topics: [String]
+  phone_number: String!
   password: String!
 }
 
 type Article {
-  author: String!
-  source: Source!
-  title: String!
-  description: String!
-  url: String!
-  urlToImage: String!
-  publishedAt: String!
+  id: String
+  creator: [String]
+  title: String
+  description: String
+  image_url: String
+  link: String
+  source_id: String
+  pubDate: String
   content: String
+  category: [String]
+  likes: [String]
+  isLiked: Boolean
 }
 
 type GenericResponse {
@@ -51,13 +81,35 @@ type GenericResponse {
 }
 
 type Source {
-  id: String!
-  name: String!
+  id: String
+  name: String
+  url: String
+  category: [String]
+  icon: String
+}
+
+type Category {
+  id: String
+  name: String
+}
+
+type SourceResponse {
+  status: String
+  results: [Source]
 }
 type Response {
-  status: String!
-  totalResults: Int!
-  articles: [Article!]!
+  status: String
+  totalResults: Int
+  results: [Article]
+}
+type ErrorResponse {
+  status: String
+  results: NewsError
+}
+
+type NewsError {
+  message: String
+  code: String
 }
 
 input ForgotPassword {
@@ -74,23 +126,56 @@ input ResetPassword {
 
 }
 
+input CompleteRegistration {
+  topics: [String]
+
+}
+
 type Mutation {
-  CreateNewUser(input: CreateUser!): User!
+  CreateNewUser(input: CreateUser!): User
 }
 
 type Query {
-  GetUser: User!
+  GetUser: User
 }
 
+
+input NewsQuery {
+  source: String
+  category: String
+  pageSize: Int
+  page: Int
+}
+
+type SourceLogo {
+  name: String
+  domain: String
+  icon: String
+}
+
+
+
 extend type Query {
-  GetNews(query: String!):[Article!]!
-  NewsFeed:[Article!]!
+#  GetNews(query: String!):[Article!]!
+  GetLatestAndTrendingNews(query: NewsQuery!):[Article]
+  GetNewsSources:[Source]
+  SeedNewsSources: [Source]
+  GetNewsCategories: [Category]
+  GetSingleNews(newsID: String!): Article
+  GetSavedNews: [Article]
 }
 
 extend type Mutation {
   Login(input: Login!): LoginResponse!
+  CompleteRegistration(input: CompleteRegistration!): GenericResponse
   ForgotPassword(input: ForgotPassword!): GenericResponse!
+  GoogleLogin(input: GoogleAuth!): LoginResponse
   ResetPassword(input: ResetPassword!): GenericResponse!
   VerifyEmail(input: VerifyOtp!): GenericResponse!
   VerifyResetOtp(input: VerifyOtp!): GenericResponse!
+  Logout(input: Logout!): GenericResponse
+  AskKora(input: promptContent!): promptResponse
+  SaveNews(newsID: String!): Boolean
+  LikeNews(newsID: String!): Boolean
+  ResendOtp(email: String!): GenericResponse
 }

@@ -1,0 +1,38 @@
+[
+  {
+    "name": "business"
+  },
+  {
+    "name": "technology"
+  },
+  {
+    "name": "sports"
+  },
+  {
+    "name": "entertainment"
+  },
+  {
+    "name": "general"
+  },
+  {
+    "name": "health"
+  },
+  {
+    "name": "science"
+  },
+  {
+    "name": "environment"
+  },
+  {
+    "name": "food"
+  },
+  {
+    "name": "politics"
+  },
+  {
+    "name": "tourism"
+  },
+  {
+    "name": "world"
+  }
+]

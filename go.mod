@@ -12,6 +12,8 @@ require (
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/mailgun/mailgun-go/v3 v3.6.4
 	github.com/matcornic/hermes/v2 v2.1.0
+	github.com/robfig/cron/v3 v3.0.1
+	github.com/sashabaranov/go-openai v1.9.4
 	github.com/spf13/viper v1.15.0
 	github.com/vektah/gqlparser/v2 v2.2.0
 	go.mongodb.org/mongo-driver v1.8.3

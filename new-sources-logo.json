@@ -1,0 +1,478 @@
+[
+  {
+    "id": "abc-news",
+    "name": "ABC News",
+    "description": "Your trusted source for breaking news, analysis, exclusive interviews, headlines, and videos at ABCNews.com.",
+    "url": "https://abcnews.go.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:ABC_News_solid_black_logo.svg#/media/File:ABC_News_solid_black_logo.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "abc-news-au",
+    "name": "ABC News (AU)",
+    "description": "Australia's most trusted source of local, national and world news. Comprehensive, independent, in-depth analysis, the latest business, sport, weather and more.",
+    "url": "http://www.abc.net.au/news",
+    "logo": "https://en.wikipedia.org/wiki/File:ABC_News_Channel.svg#/media/File:ABC_News_Channel.svg",
+    "category": "general",
+    "language": "en",
+    "country": "au"
+  },
+  {
+    "id": "aftenposten",
+    "name": "Aftenposten",
+    "description": "Norges ledende nettavis med alltid oppdaterte nyheter innenfor innenriks, utenriks, sport og kultur.",
+    "url": "https://www.aftenposten.no",
+    "logo": "https://commons.wikimedia.org/wiki/File:Aftenposten_logo.svg#/media/File:Aftenposten_logo.svg",
+    "category": "general",
+    "language": "no",
+    "country": "no"
+  },
+  {
+    "id": "al-jazeera-english",
+    "name": "Al Jazeera English",
+    "description": "News, analysis from the Middle East and worldwide, multimedia and interactives, opinions, documentaries, podcasts, long reads and broadcast schedule.",
+    "url": "http://www.aljazeera.com",
+    "logo": "https://en.wikipedia.org/wiki/File:Aljazeera_eng.svg#/media/File:Aljazeera_eng.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+
+  {
+    "id": "ars-technica",
+    "name": "Ars Technica",
+    "description": "The PC enthusiast's resource. Power users and the tools they love, without computing religion.",
+    "url": "http://arstechnica.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:Ars_Technica_logo_(2016).svg#/media/File:Ars_Technica_logo_(2016).svg",
+    "category": "technology",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "ary-news",
+    "name": "Ary News",
+    "description": "ARY News is a Pakistani news channel committed to bring you up-to-the minute Pakistan news and featured stories from around Pakistan and all over the world.",
+    "url": "https://arynews.tv/ud/",
+    "logo": "https://commons.wikimedia.org/wiki/File:Arynews.jpg#/media/File:Arynews.jpg",
+    "category": "general",
+    "language": "ud",
+    "country": "pk"
+  },
+  {
+    "id": "associated-press",
+    "name": "Associated Press",
+    "description": "The AP delivers in-depth coverage on the international, politics, lifestyle, business, and entertainment news.",
+    "url": "https://apnews.com/",
+    "logo": "https://commons.wikimedia.org/wiki/File:Associated_Press_logo_2012.svg#/media/File:Associated_Press_logo_2012.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "bbc-news",
+    "name": "BBC News",
+    "description": "Use BBC News for up-to-the-minute news, breaking news, video, audio and feature stories. BBC News provides trusted World and UK news as well as local and regional perspectives. Also entertainment, business, science, technology and health news.",
+    "url": "http://www.bbc.co.uk/news",
+    "logo": "https://commons.wikimedia.org/wiki/File:BBC_News_2022_(Alt).svg#/media/File:BBC_News_2022_(Alt).svg",
+    "category": "general",
+    "language": "en",
+    "country": "gb"
+  },
+  {
+    "id": "bbc-sport",
+    "name": "BBC Sport",
+    "description": "The home of BBC Sport online. Includes live sports coverage, breaking news, results, video, audio and analysis on Football, F1, Cricket, Rugby Union, Rugby League, Golf, Tennis and all the main world sports, plus major events such as the Olympic Games.",
+    "url": "http://www.bbc.co.uk/sport",
+    "logo": "https://commons.wikimedia.org/wiki/File:BBC_Sport_(2022,_alt).svg#/media/File:BBC_Sport_(2022,_alt).svg",
+    "category": "sports",
+    "language": "en",
+    "country": "gb"
+  },
+
+  {
+    "id": "bleacher-report",
+    "name": "Bleacher Report",
+    "description": "Sports journalists and bloggers covering NFL, MLB, NBA, NHL, MMA, college football and basketball, NASCAR, fantasy sports and more. News, photos, mock drafts, game scores, player profiles and more!",
+    "url": "http://www.bleacherreport.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:Bleacher_Report_logo.svg#/media/File:Bleacher_Report_logo.svg",
+    "category": "sports",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "bloomberg",
+    "name": "Bloomberg",
+    "description": "Bloomberg delivers business and markets news, data, analysis, and video to the world, featuring stories from Businessweek and Bloomberg News.",
+    "url": "http://www.bloomberg.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:Bloomberg_logo.svg#/media/File:Bloomberg_logo.svg",
+    "category": "business",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "breitbart-news",
+    "name": "Breitbart News",
+    "description": "Syndicated news and opinion website providing continuously updated headlines to top news and analysis sources.",
+    "url": "http://www.breitbart.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:Breitbart_News.svg#/media/File:Breitbart_News.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "business-insider",
+    "name": "Business Insider",
+    "description": "Business Insider is a fast-growing business site with deep financial, media, tech, and other industry verticals. Launched in 2007, the site is now the largest business news site on the web.",
+    "url": "http://www.businessinsider.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:Business_Insider_Logo.svg#/media/File:Business_Insider_Logo.svg",
+    "category": "business",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "buzzfeed",
+    "name": "Buzzfeed",
+    "description": "BuzzFeed is a cross-platform, global network for news and entertainment that generates seven billion views each month.",
+    "url": "https://www.buzzfeed.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:BuzzFeed.svg#/media/File:BuzzFeed.svg",
+    "category": "entertainment",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "cbc-news",
+    "name": "CBC News",
+    "description": "CBC News is the division of the Canadian Broadcasting Corporation responsible for the news gathering and production of news programs on the corporation's English-language operations, namely CBC Television, CBC Radio, CBC News Network, and CBC.ca.",
+    "url": "http://www.cbc.ca/news",
+    "logo": "https://commons.wikimedia.org/wiki/File:CBC_News_Logo_(2020).png#/media/File:CBC_News_Logo_(2020).png",
+    "category": "general",
+    "language": "en",
+    "country": "ca"
+  },
+  {
+    "id": "cbs-news",
+    "name": "CBS News",
+    "description": "CBS News: dedicated to providing the best in journalism under standards it pioneered at the dawn of radio and television and continue in the digital age.",
+    "url": "http://www.cbsnews.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:CBS_News_logo_(2020).svg#/media/File:CBS_News_logo_(2020).svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "cnn",
+    "name": "CNN",
+    "description": "View the latest news and breaking news today for U.S., world, weather, entertainment, politics and health at CNN",
+    "url": "http://us.cnn.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:CNN.svg#/media/File:CNN.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+
+  {
+    "id": "engadget",
+    "name": "Engadget",
+    "description": "Engadget is a web magazine with obsessive daily coverage of everything new in gadgets and consumer electronics.",
+    "url": "https://www.engadget.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:Engadget-logo.svg#/media/File:Engadget-logo.svg",
+    "category": "technology",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "espn",
+    "name": "ESPN",
+    "description": "ESPN has up-to-the-minute sports news coverage, scores, highlights and commentary for NFL, MLB, NBA, College Football, NCAA Basketball and more.",
+    "url": "https://www.espn.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:ESPN_wordmark.svg#/media/File:ESPN_wordmark.svg",
+    "category": "sports",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "football-italia",
+    "name": "Football Italia",
+    "description": "Italian football news, analysis, fixtures and results for the latest from Serie A, Serie B and the Azzurri.",
+    "url": "http://www.football-italia.net",
+    "logo": "https://commons.wikimedia.org/wiki/File:Serie_A_logo_2022.svg#/media/File:Serie_A_logo_2022.svg",
+    "category": "sports",
+    "language": "en",
+    "country": "it"
+  },
+  {
+    "id": "fox-news",
+    "name": "Fox News",
+    "description": "Breaking News, Latest News and Current News from FOXNews.com. Breaking news and video. Latest Current News: U.S., World, Entertainment, Health, Business, Technology, Politics, Sports.",
+    "url": "http://www.foxnews.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:Fox_News_Channel_logo.svg#/media/File:Fox_News_Channel_logo.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "fox-sports",
+    "name": "Fox Sports",
+    "description": "Find live scores, player and team news, videos, rumors, stats, standings, schedules and fantasy games on FOX Sports.",
+    "url": "http://www.foxsports.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:FOX_Sports_logo.svg#/media/File:FOX_Sports_logo.svg",
+    "category": "sports",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "google-news",
+    "name": "Google News",
+    "description": "Comprehensive, up-to-date news coverage, aggregated from sources all over the world by Google News.",
+    "url": "https://news.google.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:Google_News_icon.svg#/media/File:Google_News_icon.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "goteborgs-posten",
+    "name": "Göteborgs-Posten",
+    "description": "Göteborgs-Posten, abbreviated GP, is a major Swedish language daily newspaper published in Gothenburg, Sweden.",
+    "url": "http://www.gp.se",
+    "category": "general",
+    "language": "sv",
+    "country": "se"
+  },
+
+  {
+    "id": "hacker-news",
+    "name": "Hacker News",
+    "description": "Hacker News is a social news website focusing on computer science and entrepreneurship. It is run by Paul Graham's investment fund and startup incubator, Y Combinator. In general, content that can be submitted is defined as \"anything that gratifies one's intellectual curiosity\".",
+    "url": "https://news.ycombinator.com",
+    "logo": "https://en.wikipedia.org/wiki/File:Hackernews_logo.png#/media/File:Hackernews_logo.png",
+    "category": "technology",
+    "language": "en",
+    "country": "us"
+  },
+
+  {
+    "id": "ign",
+    "name": "IGN",
+    "description": "IGN is your site for Xbox One, PS4, PC, Wii-U, Xbox 360, PS3, Wii, 3DS, PS Vita and iPhone games with expert reviews, news, previews, trailers, cheat codes, wiki guides and walkthroughs.",
+    "url": "http://www.ign.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:IGN_logo.svg#/media/File:IGN_logo.svg",
+    "category": "entertainment",
+    "language": "en",
+    "country": "us"
+  },
+
+  {
+    "id": "infobae",
+    "name": "Infobae",
+    "description": "Noticias de Argentina y del mundo en tiempo real. Información, videos y fotos sobre los hechos más relevantes y sus protagonistas. Léelo antes en infobae.",
+    "url": "http://www.infobae.com/?noredirect",
+    "logo": "https://commons.wikimedia.org/wiki/File:Infobae.com_logo.png#/media/File:Infobae.com_logo.png",
+    "category": "general",
+    "language": "es",
+    "country": "ar"
+  },
+
+  {
+    "id": "mashable",
+    "name": "Mashable",
+    "description": "Mashable is a global, multi-platform media and entertainment company.",
+    "url": "https://mashable.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:Mashable_Logo_(2021).svg#/media/File:Mashable_Logo_(2021).svg",
+    "category": "entertainment",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "msnbc",
+    "name": "MSNBC",
+    "description": "Breaking news and in-depth analysis of the headlines, as well as commentary and informed perspectives from The Rachel Maddow Show, Morning Joe & more.",
+    "url": "http://www.msnbc.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:MSNBC_2021.svg#/media/File:MSNBC_2021.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "mtv-news",
+    "name": "MTV News",
+    "description": "The ultimate news source for music, celebrity, entertainment, movies, and current events on the web. It's pop culture on steroids.",
+    "url": "http://www.mtv.com/news",
+    "logo": "https://commons.wikimedia.org/wiki/File:MTV-2021.svg#/media/File:MTV-2021.svg",
+    "category": "entertainment",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "national-geographic",
+    "name": "National Geographic",
+    "description": "Reporting our world daily: original nature and science news from National Geographic.",
+    "url": "http://news.nationalgeographic.com",
+    "category": "science",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "national-review",
+    "name": "National Review",
+    "description": "National Review: Conservative News, Opinion, Politics, Policy, & Current Events.",
+    "url": "https://www.nationalreview.com/",
+    "logo": "https://commons.wikimedia.org/wiki/File:Natgeologo.svg#/media/File:Natgeologo.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "nbc-news",
+    "name": "NBC News",
+    "description": "Breaking news, videos, and the latest top stories in world news, business, politics, health and pop culture.",
+    "url": "http://www.nbcnews.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:NBC_News_2011.svg#/media/File:NBC_News_2011.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "news24",
+    "name": "News24",
+    "description": "South Africa's premier news source, provides breaking news on national, world, Africa, sport, entertainment, technology and more.",
+    "url": "http://www.news24.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:News24_New_Logo.jpg#/media/File:News24_New_Logo.jpg",
+    "category": "general",
+    "language": "en",
+    "country": "za"
+  },
+  {
+    "id": "politico",
+    "name": "Politico",
+    "description": "Political news about Congress, the White House, campaigns, lobbyists and issues.",
+    "url": "https://www.politico.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:POLITICOLOGO.svg#/media/File:POLITICOLOGO.svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "recode",
+    "name": "Recode",
+    "description": "Get the latest independent tech news, reviews and analysis from Recode with the most informed and respected journalists in technology and media.",
+    "url": "http://www.recode.net",
+    "logo": "https://commons.wikimedia.org/wiki/File:Recode_logo_2016.svg#/media/File:Recode_logo_2016.svg",
+    "category": "technology",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "rte",
+    "name": "RTE",
+    "description": "Get all of the latest breaking local and international news stories as they happen, with up to the minute updates and analysis, from Ireland's National Broadcaster.",
+    "url": "https://www.rte.ie/news",
+    "logo": "https://commons.wikimedia.org/wiki/File:RT%C3%89_logo_(2014).svg#/media/File:RTÉ_logo_(2014).svg",
+    "category": "general",
+    "language": "en",
+    "country": "ie"
+  },
+  {
+    "id": "talksport",
+    "name": "TalkSport",
+    "description": "Tune in to the world's biggest sports radio station - Live Premier League football coverage, breaking sports news, transfer rumours &amp; exclusive interviews.",
+    "url": "http://talksport.com",
+    "logo": "https://en.wikipedia.org/wiki/File:Talksport_logo.png#/media/File:Talksport_logo.png",
+    "category": "sports",
+    "language": "en",
+    "country": "gb"
+  },
+  {
+    "id": "techcrunch",
+    "name": "TechCrunch",
+    "description": "TechCrunch is a leading technology media property, dedicated to obsessively profiling startups, reviewing new Internet products, and breaking tech news.",
+    "url": "https://techcrunch.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:TechCrunch_logo.svg#/media/File:TechCrunch_logo.svg",
+    "category": "technology",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "techradar",
+    "name": "TechRadar",
+    "description": "The latest technology news and reviews, covering computing, home entertainment systems, gadgets and more.",
+    "url": "http://www.techradar.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:TechRadar_logo.svg#/media/File:TechRadar_logo.svg",
+    "category": "technology",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "the-hill",
+    "name": "The Hill",
+    "description": "The Hill is a top US political website, read by the White House and more lawmakers than any other site -- vital for policy, politics and election campaigns.",
+    "url": "http://thehill.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:The_Hill_(2020-01-15).svg#/media/File:The_Hill_(2020-01-15).svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "the-lad-bible",
+    "name": "The Lad Bible",
+    "description": "The LAD Bible is one of the largest community for guys aged 16-30 in the world. Send us your funniest pictures and videos!",
+    "url": "https://www.theladbible.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:GroupLogo_BlackRed.png#/media/File:GroupLogo_BlackRed.png",
+    "category": "entertainment",
+    "language": "en",
+    "country": "gb"
+  },
+  {
+    "id": "the-next-web",
+    "name": "The Next Web",
+    "description": "The Next Web is one of the world’s largest online publications that delivers an international perspective on the latest news about Internet technology, business and culture.",
+    "url": "http://thenextweb.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:TNW_logo.svg#/media/File:TNW_logo.svg",
+    "category": "technology",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "the-sport-bible",
+    "name": "The Sport Bible",
+    "description": "TheSPORTbible is one of the largest communities for sports fans across the world. Send us your sporting pictures and videos!",
+    "url": "https://www.thesportbible.com",
+    "logo": "https://en.wikipedia.org/wiki/File:Sportbible-logo.png#/media/File:Sportbible-logo.png",
+    "category": "sports",
+    "language": "en",
+    "country": "gb"
+  },
+  {
+    "id": "the-verge",
+    "name": "The Verge",
+    "description": "The Verge covers the intersection of technology, science, art, and culture.",
+    "url": "http://www.theverge.com",
+    "logo": "https://commons.wikimedia.org/wiki/File:The_Verge_wordmark_2022.svg#/media/File:The_Verge_wordmark_2022.svg",
+    "category": "technology",
+    "language": "en",
+    "country": "us"
+  },
+  {
+    "id": "the-washington-times",
+    "name": "The Washington Times",
+    "description": "The Washington Times delivers breaking news and commentary on the issues that affect the future of our nation.",
+    "url": "https://www.washingtontimes.com/",
+    "logo": "https://commons.wikimedia.org/wiki/File:The_Washington_Times_(2019-10-31).svg#/media/File:The_Washington_Times_(2019-10-31).svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  },
+
+  {
+    "id": "usa-today",
+    "name": "USA Today",
+    "description": "Get the latest national, international, and political news at USATODAY.com.",
+    "url": "http://www.usatoday.com/news",
+    "logo": "https://commons.wikimedia.org/wiki/File:USA_Today_(2020-01-29).svg#/media/File:USA_Today_(2020-01-29).svg",
+    "category": "general",
+    "language": "en",
+    "country": "us"
+  }
+]

@@ -53,3 +53,36 @@ func (n NewsCacheService) GetNews(ctx context.Context, topic string) []*model.Ar
 	}
 
 }
+
+func (n NewsCacheService) SetAppToken(ctx context.Context, topic string, list []string) {
+	jsonStr, err := json.Marshal(list)
+	if err != nil {
+		log.Printf("Error converting article to json, %s", err)
+		panic(err)
+	}
+	er := redisClient.Set(ctx, topic, jsonStr, 0).Err()
+	if er != nil {
+		panic(er)
+	}
+
+}
+
+func (n NewsCacheService) GetAppToken(ctx context.Context, topic string) []string {
+	value, err := redisClient.Get(ctx, topic).Result()
+	log.Print(err)
+	if err == redis.Nil {
+		return nil
+	} else if err != nil {
+		panic(err)
+	} else {
+		var list []string
+		er := json.Unmarshal([]byte(value), &list)
+		if er != nil {
+			log.Printf("Error converting json string to article object, %s", err)
+			return nil
+		}
+		return list
+
+	}
+
+}

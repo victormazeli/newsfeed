@@ -9,6 +9,7 @@ import (
 type Env struct {
 	NewsApiBaseUrl string `mapstructure:"NEWS_API_BASE_URL"`
 	NewsApiKey     string `mapstructure:"NEWS_API_KEY"`
+	OpenAiKey      string `mapstructure:"OPEN_AI_KEY"`
 	ServerPort     string `mapstructure:"SERVER_PORT"`
 	ConnectionUrl  string `mapstructure:"CONNECTION_URL"`
 	DBName         string `mapstructure:"DB_NAME"`
