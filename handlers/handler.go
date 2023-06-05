@@ -587,7 +587,15 @@ func (h Handler) NewsFeed(id interface{}, query model.NewsQuery, ctx context.Con
 }
 func (h Handler) AskChatGPT(input model.PromptContent, env *config.Env, ctx context.Context) (*model.PromptResponse, error) {
 	c := openai.NewClient(env.OpenAiKey)
-	prompt := "analyze this text in detail " + *input.Content
+	var prompt string
+
+	if len(*input.Content) > 200 {
+		text := *input.Content
+		slicedText := text[:200]
+		prompt = "analyze this text in detail " + slicedText
+	} else {
+		prompt = "analyze this text in detail " + *input.Content
+	}
 
 	var finalResponse string
 	for {

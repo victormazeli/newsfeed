@@ -63,7 +63,15 @@ func main() {
 	}))
 
 	// Create the Gin router
-	r := gin.Default()
+	if *environment == "development" {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	r := gin.New()
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
 	r.Use(middlewares.GinContextToContextMiddleware())
 	r.POST("/query", graphqlHandler(env, h))
 	r.GET("/", playgroundHandler())
