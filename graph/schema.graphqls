@@ -143,8 +143,8 @@ type Query {
 input NewsQuery {
   source: String
   category: String
-  pageSize: Int
-  page: Int
+  pageSize: Int!
+  page: Int!
 }
 
 type SourceLogo {

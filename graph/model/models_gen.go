@@ -82,8 +82,8 @@ type NewsError struct {
 type NewsQuery struct {
 	Source   *string `json:"source"`
 	Category *string `json:"category"`
-	PageSize *int    `json:"pageSize"`
-	Page     *int    `json:"page"`
+	PageSize int     `json:"pageSize"`
+	Page     int     `json:"page"`
 }
 
 type ResetPassword struct {

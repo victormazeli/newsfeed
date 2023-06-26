@@ -988,8 +988,8 @@ type Query {
 input NewsQuery {
   source: String
   category: String
-  pageSize: Int
-  page: Int
+  pageSize: Int!
+  page: Int!
 }
 
 type SourceLogo {
@@ -5141,7 +5141,7 @@ func (ec *executionContext) unmarshalInputNewsQuery(ctx context.Context, obj int
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageSize"))
-			it.PageSize, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.PageSize, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5149,7 +5149,7 @@ func (ec *executionContext) unmarshalInputNewsQuery(ctx context.Context, obj int
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
-			it.Page, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Page, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6129,6 +6129,21 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

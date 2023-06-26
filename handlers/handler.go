@@ -517,7 +517,7 @@ func (h Handler) NewsFeed(id interface{}, query model.NewsQuery, ctx context.Con
 	var news []models.News
 	var categories []string
 	var filter bson.M
-	skip := (*query.Page - 1) * *query.PageSize
+	skip := (query.Page - 1) * query.PageSize
 
 	err := mgm.Coll(user).FindByID(id, user)
 	if err != nil {
@@ -553,7 +553,7 @@ func (h Handler) NewsFeed(id interface{}, query model.NewsQuery, ctx context.Con
 		}
 	}
 
-	cursor, err := mgm.Coll(&models.News{}).Find(ctx, filter, options.Find().SetSkip(int64(skip)).SetLimit(int64(*query.PageSize)))
+	cursor, err := mgm.Coll(&models.News{}).Find(ctx, filter, options.Find().SetSkip(int64(skip)).SetLimit(int64(query.PageSize)))
 	if err != nil {
 		return nil, err
 	}
