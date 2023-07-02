@@ -32,53 +32,52 @@ type Handler struct{}
 func (h Handler) NewUser(input model.CreateUser, env *config.Env) (*models.User, error) {
 	user := &models.User{}
 
-	e := mgm.Coll(user).First(bson.M{"email": input.Email}, user)
-
-	if e != nil {
-		//var topics []models.Topic
-		//topicsArray := input.Topics
-		//for i := 0; i < len(topicsArray); i++ {
-		//	topics = append(topics, models.Topic{
-		//		Topic: *topicsArray[i],
-		//	})
-		//}
-		hashPassword, e := utils.GenerateFromPassword(input.Password)
-		if e != nil {
-			errMessage := errors.New("an error occurred")
-			return nil, errMessage
-		}
-		otp := utils.GenerateOTP()
-		currentTime := getCurrentTime()
-		expireTime := currentTime.Add(10 * time.Minute)
-		log.Printf("time :%v", expireTime)
-		newUser := &models.User{
-			Email:         input.Email,
-			FullName:      input.FullName,
-			IsVerified:    false,
-			Otp:           otp,
-			OtpExpireTime: expireTime,
-			Topics:        []*string{},
-			Password:      hashPassword,
-			CreatedAt:     getCurrentTime(),
-			UpdatedAt:     getCurrentTime(),
-		}
-		err := mgm.Coll(&models.User{}).Create(newUser)
-
-		if err != nil {
-			log.Printf("err :%v", err)
-			errMessage := errors.New("an error occurred")
-			return nil, errMessage
-		}
-
-		subject := "Registration"
-		body := utils.GenerateOTPEmailTemplate(otp)
-		res, _ := utils.SendEmail(env, input.Email, body, subject)
-		log.Print("email sent successfully", res)
-
-		return newUser, nil
+	if e := mgm.Coll(user).First(bson.M{"email": input.Email}, user); e != nil {
+		errMessage := errors.New("user already exist")
+		return nil, errMessage
 	}
-	errMessage := errors.New("user already exist")
-	return nil, errMessage
+
+	//var topics []models.Topic
+	//topicsArray := input.Topics
+	//for i := 0; i < len(topicsArray); i++ {
+	//	topics = append(topics, models.Topic{
+	//		Topic: *topicsArray[i],
+	//	})
+	//}
+	hashPassword, e := utils.GenerateFromPassword(input.Password)
+	if e != nil {
+		errMessage := errors.New("an error occurred")
+		return nil, errMessage
+	}
+	otp := utils.GenerateOTP()
+	currentTime := getCurrentTime()
+	expireTime := currentTime.Add(10 * time.Minute)
+
+	newUser := &models.User{
+		Email:         input.Email,
+		FullName:      input.FullName,
+		IsVerified:    false,
+		Otp:           otp,
+		OtpExpireTime: expireTime,
+		Topics:        []*string{},
+		Password:      hashPassword,
+		CreatedAt:     getCurrentTime(),
+		UpdatedAt:     getCurrentTime(),
+	}
+	err := mgm.Coll(&models.User{}).Create(newUser)
+
+	if err != nil {
+		log.Printf("err :%v", err)
+		errMessage := errors.New("an error occurred")
+		return nil, errMessage
+	}
+
+	subject := "Registration"
+	body := utils.GenerateOTPEmailTemplate(otp)
+	res, _ := utils.SendEmail(env, input.Email, body, subject)
+	log.Print("email sent successfully", res)
+
+	return newUser, nil
 
 }
 
@@ -585,6 +584,7 @@ func (h Handler) NewsFeed(id interface{}, query model.NewsQuery, ctx context.Con
 
 	return articleResponse, nil
 }
+
 func (h Handler) AskChatGPT(input model.PromptContent, env *config.Env, ctx context.Context) (*model.PromptResponse, error) {
 	c := openai.NewClient(env.OpenAiKey)
 	var prompt string
@@ -1075,6 +1075,103 @@ func findLogo(brandName string, domain string) ([]*model.SourceLogo, error) {
 	return nil, errors.New("empty result")
 
 }
+
+func (h Handler) DeleteUserProfile(userID interface{}, ctx context.Context) (*model.GenericResponse, error) {
+	userIDString, err := convertToString(userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	userIDHex, err := convertToObjectId(userIDString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = mgm.Coll(&models.SavedNews{}).DeleteMany(ctx, bson.M{"user_id": userIDHex})
+
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = mgm.Coll(&models.User{}).DeleteMany(ctx, bson.M{"user_id": userIDHex})
+	if err != nil {
+		return nil, err
+	}
+
+	response := &model.GenericResponse{
+		Message: "account deleted successful",
+	}
+
+	return response, nil
+
+}
+
+func (h Handler) EditUserProfile(userID interface{}, profile model.UpdateProfile, ctx context.Context) (*model.GenericResponse, error) {
+	userIDString, err := convertToString(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	userIDHex, err := convertToObjectId(userIDString)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": userIDHex}
+	data := bson.M{
+		"$set": bson.M{
+			"picture":   profile.Picture,
+			"full_name": profile.FullName,
+		},
+	}
+
+	if _, err := mgm.Coll(&models.User{}).UpdateOne(ctx, filter, data); err != nil {
+		return nil, errors.New("unable to update user")
+	}
+
+	result := &model.GenericResponse{
+		Message: "update successful",
+	}
+
+	return result, nil
+}
+
+func (h Handler) EditUserInterest(userID interface{}, topics []string, ctx context.Context) (*model.GenericResponse, error) {
+
+	userIDString, err := convertToString(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	userIDHex, err := convertToObjectId(userIDString)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.D{{"_id", userIDHex}}
+	data := bson.M{
+		"$set": bson.M{
+			"topics": topics,
+		},
+	}
+
+	_, err = mgm.Coll(&models.User{}).UpdateOne(ctx, filter, data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := &model.GenericResponse{
+		Message: "Interests updated",
+	}
+
+	return response, nil
+
+}
+
+// Reusable Functions
 func convertToObjectId(id string) (primitive.ObjectID, error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

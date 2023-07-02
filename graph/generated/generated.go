@@ -90,6 +90,9 @@ type ComplexityRoot struct {
 		AskKora              func(childComplexity int, input model.PromptContent) int
 		CompleteRegistration func(childComplexity int, input model.CompleteRegistration) int
 		CreateNewUser        func(childComplexity int, input model.CreateUser) int
+		DeleteProfile        func(childComplexity int) int
+		EditUserInterest     func(childComplexity int, topics []string) int
+		EditUserProfile      func(childComplexity int, input model.UpdateProfile) int
 		ForgotPassword       func(childComplexity int, input model.ForgotPassword) int
 		GoogleLogin          func(childComplexity int, input model.GoogleAuth) int
 		LikeNews             func(childComplexity int, newsID string) int
@@ -174,6 +177,9 @@ type MutationResolver interface {
 	SaveNews(ctx context.Context, newsID string) (*bool, error)
 	LikeNews(ctx context.Context, newsID string) (*bool, error)
 	ResendOtp(ctx context.Context, email string) (*model.GenericResponse, error)
+	EditUserProfile(ctx context.Context, input model.UpdateProfile) (*model.GenericResponse, error)
+	DeleteProfile(ctx context.Context) (*model.GenericResponse, error)
+	EditUserInterest(ctx context.Context, topics []string) (*model.GenericResponse, error)
 }
 type QueryResolver interface {
 	GetUser(ctx context.Context) (*model.User, error)
@@ -417,6 +423,37 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateNewUser(childComplexity, args["input"].(model.CreateUser)), true
+
+	case "Mutation.DeleteProfile":
+		if e.complexity.Mutation.DeleteProfile == nil {
+			break
+		}
+
+		return e.complexity.Mutation.DeleteProfile(childComplexity), true
+
+	case "Mutation.EditUserInterest":
+		if e.complexity.Mutation.EditUserInterest == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_EditUserInterest_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EditUserInterest(childComplexity, args["topics"].([]string)), true
+
+	case "Mutation.EditUserProfile":
+		if e.complexity.Mutation.EditUserProfile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_EditUserProfile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EditUserProfile(childComplexity, args["input"].(model.UpdateProfile)), true
 
 	case "Mutation.ForgotPassword":
 		if e.complexity.Mutation.ForgotPassword == nil {
@@ -867,6 +904,11 @@ input Login {
   password: String!
 }
 
+input UpdateProfile {
+  picture: String
+  full_name: String
+}
+
 input Logout {
   token: String!
 }
@@ -1023,6 +1065,9 @@ extend type Mutation {
   SaveNews(newsID: String!): Boolean
   LikeNews(newsID: String!): Boolean
   ResendOtp(email: String!): GenericResponse
+  EditUserProfile(input: UpdateProfile!): GenericResponse
+  DeleteProfile: GenericResponse
+  EditUserInterest(topics: [String!]): GenericResponse
 }
 `, BuiltIn: false},
 }
@@ -1069,6 +1114,36 @@ func (ec *executionContext) field_Mutation_CreateNewUser_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCreateUser2newsfeedbackendᚋgraphᚋmodelᚐCreateUser(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_EditUserInterest_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["topics"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("topics"))
+		arg0, err = ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["topics"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_EditUserProfile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateProfile
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateProfile2newsfeedbackendᚋgraphᚋmodelᚐUpdateProfile(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2657,6 +2732,116 @@ func (ec *executionContext) _Mutation_ResendOtp(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().ResendOtp(rctx, args["email"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.GenericResponse)
+	fc.Result = res
+	return ec.marshalOGenericResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_EditUserProfile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_EditUserProfile_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EditUserProfile(rctx, args["input"].(model.UpdateProfile))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.GenericResponse)
+	fc.Result = res
+	return ec.marshalOGenericResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_DeleteProfile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteProfile(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.GenericResponse)
+	fc.Result = res
+	return ec.marshalOGenericResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_EditUserInterest(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_EditUserInterest_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EditUserInterest(rctx, args["topics"].([]string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5190,6 +5375,37 @@ func (ec *executionContext) unmarshalInputResetPassword(ctx context.Context, obj
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateProfile(ctx context.Context, obj interface{}) (model.UpdateProfile, error) {
+	var it model.UpdateProfile
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "picture":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("picture"))
+			it.Picture, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "full_name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("full_name"))
+			it.FullName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputVerifyOtp(ctx context.Context, obj interface{}) (model.VerifyOtp, error) {
 	var it model.VerifyOtp
 	asMap := map[string]interface{}{}
@@ -5490,6 +5706,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_LikeNews(ctx, field)
 		case "ResendOtp":
 			out.Values[i] = ec._Mutation_ResendOtp(ctx, field)
+		case "EditUserProfile":
+			out.Values[i] = ec._Mutation_EditUserProfile(ctx, field)
+		case "DeleteProfile":
+			out.Values[i] = ec._Mutation_DeleteProfile(ctx, field)
+		case "EditUserInterest":
+			out.Values[i] = ec._Mutation_EditUserInterest(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6216,6 +6438,11 @@ func (ec *executionContext) marshalNTimestamp2string(ctx context.Context, sel as
 	return res
 }
 
+func (ec *executionContext) unmarshalNUpdateProfile2newsfeedbackendᚋgraphᚋmodelᚐUpdateProfile(ctx context.Context, v interface{}) (model.UpdateProfile, error) {
+	res, err := ec.unmarshalInputUpdateProfile(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNVerifyOtp2newsfeedbackendᚋgraphᚋmodelᚐVerifyOtp(ctx context.Context, v interface{}) (model.VerifyOtp, error) {
 	res, err := ec.unmarshalInputVerifyOtp(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -6694,6 +6921,48 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalString(v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {

@@ -116,6 +116,11 @@ type SourceResponse struct {
 	Results []*Source `json:"results"`
 }
 
+type UpdateProfile struct {
+	Picture  *string `json:"picture"`
+	FullName *string `json:"full_name"`
+}
+
 type User struct {
 	ID              string    `json:"_id"`
 	Email           *string   `json:"email"`

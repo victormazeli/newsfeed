@@ -204,6 +204,63 @@ func (r *mutationResolver) ResendOtp(ctx context.Context, email string) (*model.
 	return response, nil
 }
 
+func (r *mutationResolver) EditUserProfile(ctx context.Context, input model.UpdateProfile) (*model.GenericResponse, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sub, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+
+	response, err := handlers.Handler{}.EditUserProfile(sub, input, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *mutationResolver) DeleteProfile(ctx context.Context) (*model.GenericResponse, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sub, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+
+	response, err := handlers.Handler{}.DeleteUserProfile(sub, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *mutationResolver) EditUserInterest(ctx context.Context, topics []string) (*model.GenericResponse, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sub, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+
+	response, err := handlers.Handler{}.EditUserInterest(sub, topics, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
 func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 	gc, err := middlewares.GinContextFromContext(ctx)
 	if err != nil {

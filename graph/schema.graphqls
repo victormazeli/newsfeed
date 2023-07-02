@@ -22,6 +22,11 @@ input Login {
   password: String!
 }
 
+input UpdateProfile {
+  picture: String
+  full_name: String
+}
+
 input Logout {
   token: String!
 }
@@ -178,4 +183,7 @@ extend type Mutation {
   SaveNews(newsID: String!): Boolean
   LikeNews(newsID: String!): Boolean
   ResendOtp(email: String!): GenericResponse
+  EditUserProfile(input: UpdateProfile!): GenericResponse
+  DeleteProfile: GenericResponse
+  EditUserInterest(topics: [String!]): GenericResponse
 }

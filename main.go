@@ -18,7 +18,13 @@ import (
 const defaultPort = "8080"
 
 // Defining the Graphql handler
-func graphqlHandler(env *config.Env, h *handler.Server) gin.HandlerFunc {
+func graphqlHandler(env *config.Env) gin.HandlerFunc {
+	// pass the env to the resolver since the resolver instance is where we can initialize dependencies
+	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
+		Resolvers: &graph.Resolver{
+			Env: env,
+		},
+	}))
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
@@ -55,13 +61,6 @@ func main() {
 	// Initialize cron job
 	utils.InitCron(context.Background(), env)
 
-	// Create the GraphQL handler
-	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
-		Resolvers: &graph.Resolver{
-			Env: env,
-		},
-	}))
-
 	// Create the Gin router
 	if *environment == "development" {
 		gin.SetMode(gin.DebugMode)
@@ -73,7 +72,7 @@ func main() {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(middlewares.GinContextToContextMiddleware())
-	r.POST("/query", graphqlHandler(env, h))
+	r.POST("/query", graphqlHandler(env))
 	r.GET("/", playgroundHandler())
 
 	// Start the server

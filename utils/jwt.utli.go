@@ -15,7 +15,7 @@ type JWTClaim struct {
 func GenerateToken(userId string, jwtkey string) string {
 	//var c = config.GetConfig()
 	var jwtKey = []byte(jwtkey)
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(24 * 5 * time.Hour)
 	claims := &JWTClaim{
 		UserId: userId,
 		RegisteredClaims: jwt.RegisteredClaims{
