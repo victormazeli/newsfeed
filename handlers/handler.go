@@ -1171,6 +1171,65 @@ func (h Handler) EditUserInterest(userID interface{}, topics []string, ctx conte
 
 }
 
+func (h Handler) ChangeUserPassword(userID interface{}, input model.ChangePassword, ctx context.Context) (*model.GenericResponse, error) {
+	userIDString, err := convertToString(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	userIDHex, err := convertToObjectId(userIDString)
+	if err != nil {
+		return nil, err
+	}
+
+	user := &models.User{}
+
+	err = mgm.Coll(user).First(bson.M{"_id": userIDHex}, user)
+
+	if err != nil && err == mongo.ErrNoDocuments {
+		errMessage := errors.New("account not found")
+		return nil, errMessage
+	}
+
+	passwordMatch, e := utils.ComparePasswordAndHash(input.OldPassword, user.Password)
+
+	if e != nil {
+		errMessage := errors.New("an error occurred")
+		return nil, errMessage
+	}
+
+	if passwordMatch == false {
+		errMessage := errors.New("invalid password")
+		return nil, errMessage
+	}
+
+	hashPassword, e := utils.GenerateFromPassword(input.NewPassword)
+	if e != nil {
+		errMessage := errors.New("an error occurred")
+		return nil, errMessage
+	}
+
+	filter := bson.D{{"_id", userIDHex}}
+	data := bson.M{
+		"$set": bson.M{
+			"password": hashPassword,
+		},
+	}
+
+	_, err = mgm.Coll(&models.User{}).UpdateOne(ctx, filter, data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := &model.GenericResponse{
+		Message: "password changed successfully",
+	}
+
+	return response, nil
+
+}
+
 // Reusable Functions
 func convertToObjectId(id string) (primitive.ObjectID, error) {
 	objectID, err := primitive.ObjectIDFromHex(id)

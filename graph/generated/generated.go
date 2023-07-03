@@ -88,6 +88,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		AskKora              func(childComplexity int, input model.PromptContent) int
+		ChangePassword       func(childComplexity int, input model.ChangePassword) int
 		CompleteRegistration func(childComplexity int, input model.CompleteRegistration) int
 		CreateNewUser        func(childComplexity int, input model.CreateUser) int
 		DeleteProfile        func(childComplexity int) int
@@ -153,6 +154,7 @@ type ComplexityRoot struct {
 		IsOtpVerified   func(childComplexity int) int
 		IsPasswordReset func(childComplexity int) int
 		IsVerified      func(childComplexity int) int
+		PhoneNumber     func(childComplexity int) int
 		Picture         func(childComplexity int) int
 		Topics          func(childComplexity int) int
 		UpdatedAt       func(childComplexity int) int
@@ -180,6 +182,7 @@ type MutationResolver interface {
 	EditUserProfile(ctx context.Context, input model.UpdateProfile) (*model.GenericResponse, error)
 	DeleteProfile(ctx context.Context) (*model.GenericResponse, error)
 	EditUserInterest(ctx context.Context, topics []string) (*model.GenericResponse, error)
+	ChangePassword(ctx context.Context, input model.ChangePassword) (*model.GenericResponse, error)
 }
 type QueryResolver interface {
 	GetUser(ctx context.Context) (*model.User, error)
@@ -399,6 +402,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AskKora(childComplexity, args["input"].(model.PromptContent)), true
+
+	case "Mutation.ChangePassword":
+		if e.complexity.Mutation.ChangePassword == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_ChangePassword_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ChangePassword(childComplexity, args["input"].(model.ChangePassword)), true
 
 	case "Mutation.CompleteRegistration":
 		if e.complexity.Mutation.CompleteRegistration == nil {
@@ -788,6 +803,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.IsVerified(childComplexity), true
 
+	case "User.phone_number":
+		if e.complexity.User.PhoneNumber == nil {
+			break
+		}
+
+		return e.complexity.User.PhoneNumber(childComplexity), true
+
 	case "User.picture":
 		if e.complexity.User.Picture == nil {
 			break
@@ -887,6 +909,7 @@ type User {
   email: String
   picture: String
   full_name: String
+  phone_number: String
   topics: [String]
   is_verified: Boolean
   is_otp_verified: Boolean
@@ -1018,6 +1041,11 @@ input CompleteRegistration {
 
 }
 
+input ChangePassword {
+  newPassword: String!
+  oldPassword: String!
+}
+
 type Mutation {
   CreateNewUser(input: CreateUser!): User
 }
@@ -1068,6 +1096,7 @@ extend type Mutation {
   EditUserProfile(input: UpdateProfile!): GenericResponse
   DeleteProfile: GenericResponse
   EditUserInterest(topics: [String!]): GenericResponse
+  ChangePassword(input: ChangePassword!): GenericResponse
 }
 `, BuiltIn: false},
 }
@@ -1084,6 +1113,21 @@ func (ec *executionContext) field_Mutation_AskKora_args(ctx context.Context, raw
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNpromptContent2newsfeedbackendᚋgraphᚋmodelᚐPromptContent(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_ChangePassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ChangePassword
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNChangePassword2newsfeedbackendᚋgraphᚋmodelᚐChangePassword(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2855,6 +2899,45 @@ func (ec *executionContext) _Mutation_EditUserInterest(ctx context.Context, fiel
 	return ec.marshalOGenericResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_ChangePassword(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_ChangePassword_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ChangePassword(rctx, args["input"].(model.ChangePassword))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.GenericResponse)
+	fc.Result = res
+	return ec.marshalOGenericResponse2ᚖnewsfeedbackendᚋgraphᚋmodelᚐGenericResponse(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _NewsError_message(ctx context.Context, field graphql.CollectedField, obj *model.NewsError) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3762,6 +3845,38 @@ func (ec *executionContext) _User_full_name(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.FullName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_phone_number(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PhoneNumber, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5127,6 +5242,37 @@ func (ec *executionContext) _promptResponse_result(ctx context.Context, field gr
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputChangePassword(ctx context.Context, obj interface{}) (model.ChangePassword, error) {
+	var it model.ChangePassword
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "newPassword":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("newPassword"))
+			it.NewPassword, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "oldPassword":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("oldPassword"))
+			it.OldPassword, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCompleteRegistration(ctx context.Context, obj interface{}) (model.CompleteRegistration, error) {
 	var it model.CompleteRegistration
 	asMap := map[string]interface{}{}
@@ -5712,6 +5858,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_DeleteProfile(ctx, field)
 		case "EditUserInterest":
 			out.Values[i] = ec._Mutation_EditUserInterest(ctx, field)
+		case "ChangePassword":
+			out.Values[i] = ec._Mutation_ChangePassword(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5992,6 +6140,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_picture(ctx, field, obj)
 		case "full_name":
 			out.Values[i] = ec._User_full_name(ctx, field, obj)
+		case "phone_number":
+			out.Values[i] = ec._User_phone_number(ctx, field, obj)
 		case "topics":
 			out.Values[i] = ec._User_topics(ctx, field, obj)
 		case "is_verified":
@@ -6308,6 +6458,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNChangePassword2newsfeedbackendᚋgraphᚋmodelᚐChangePassword(ctx context.Context, v interface{}) (model.ChangePassword, error) {
+	res, err := ec.unmarshalInputChangePassword(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNCompleteRegistration2newsfeedbackendᚋgraphᚋmodelᚐCompleteRegistration(ctx context.Context, v interface{}) (model.CompleteRegistration, error) {

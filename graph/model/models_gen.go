@@ -22,6 +22,11 @@ type Category struct {
 	Name *string `json:"name"`
 }
 
+type ChangePassword struct {
+	NewPassword string `json:"newPassword"`
+	OldPassword string `json:"oldPassword"`
+}
+
 type CompleteRegistration struct {
 	Topics []*string `json:"topics"`
 }
@@ -126,6 +131,7 @@ type User struct {
 	Email           *string   `json:"email"`
 	Picture         *string   `json:"picture"`
 	FullName        *string   `json:"full_name"`
+	PhoneNumber     *string   `json:"phone_number"`
 	Topics          []*string `json:"topics"`
 	IsVerified      *bool     `json:"is_verified"`
 	IsOtpVerified   *bool     `json:"is_otp_verified"`

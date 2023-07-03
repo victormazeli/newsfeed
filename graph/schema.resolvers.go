@@ -261,6 +261,25 @@ func (r *mutationResolver) EditUserInterest(ctx context.Context, topics []string
 	return response, nil
 }
 
+func (r *mutationResolver) ChangePassword(ctx context.Context, input model.ChangePassword) (*model.GenericResponse, error) {
+	gc, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sub, er := middlewares.Auth(gc, r.Env)
+	if er != nil {
+		return nil, er
+	}
+	id := sub
+	response, err := handlers.Handler{}.ChangeUserPassword(id, input, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
 func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 	gc, err := middlewares.GinContextFromContext(ctx)
 	if err != nil {
@@ -293,6 +312,7 @@ func (r *queryResolver) GetUser(ctx context.Context) (*model.User, error) {
 		IsOtpVerified:   &getUser.IsOtpVerified,
 		IsPasswordReset: &getUser.IsPasswordReset,
 		Picture:         &getUser.Picture,
+		PhoneNumber:     &getUser.PhoneNumber,
 		FullName:        &getUser.FullName,
 		ID:              getUser.ID.Hex(),
 		Topics:          getUser.Topics,
