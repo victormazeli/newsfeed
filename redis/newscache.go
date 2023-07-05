@@ -54,7 +54,7 @@ func (n NewsCacheService) GetNews(ctx context.Context, topic string) []*model.Ar
 
 }
 
-func (n NewsCacheService) SetAppToken(ctx context.Context, topic string, list []string) {
+func (n NewsCacheService) SetAppToken(ctx context.Context, topic string, list []map[string]string) {
 	jsonStr, err := json.Marshal(list)
 	if err != nil {
 		log.Printf("Error converting article to json, %s", err)
@@ -67,7 +67,7 @@ func (n NewsCacheService) SetAppToken(ctx context.Context, topic string, list []
 
 }
 
-func (n NewsCacheService) GetAppToken(ctx context.Context, topic string) []string {
+func (n NewsCacheService) GetAppToken(ctx context.Context, topic string) []map[string]string {
 	value, err := redisClient.Get(ctx, topic).Result()
 	log.Print(err)
 	if err == redis.Nil {
@@ -75,7 +75,7 @@ func (n NewsCacheService) GetAppToken(ctx context.Context, topic string) []strin
 	} else if err != nil {
 		panic(err)
 	} else {
-		var list []string
+		var list []map[string]string
 		er := json.Unmarshal([]byte(value), &list)
 		if er != nil {
 			log.Printf("Error converting json string to article object, %s", err)

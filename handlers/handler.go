@@ -58,6 +58,7 @@ func (h Handler) NewUser(input model.CreateUser, env *config.Env) (*models.User,
 		FullName:      input.FullName,
 		IsVerified:    false,
 		Otp:           otp,
+		PhoneNumber:   input.PhoneNumber,
 		OtpExpireTime: expireTime,
 		Topics:        []*string{},
 		Password:      hashPassword,
@@ -149,18 +150,14 @@ func (h Handler) Login(input model.Login, env *config.Env, ctx context.Context) 
 		return nil, errMessage
 	}
 	token := utils.GenerateToken(user.ID.Hex(), env.JwtKey)
-	//
-	//var topics []*model.T
-	//topicsArray := user.Topics
-	//for i := 0; i < len(topicsArray); i++ {
-	//	topics = append(topics, &model.Topic{
-	//		Topic: topicsArray[i].Topic,
-	//	})
-	//}
 
-	var appTokens []string
+	userToken := make(map[string]string)
+	userToken["token"] = token
+	userToken["user_id"] = user.ID.Hex()
 
-	appTokens = append(appTokens, token)
+	var appTokens []map[string]string
+
+	appTokens = append(appTokens, userToken)
 
 	redis.NewsCacheService{}.SetAppToken(ctx, "appToken", appTokens)
 
@@ -445,9 +442,13 @@ func (h Handler) GoogleLogin(input model.GoogleAuth, env *config.Env, ctx contex
 			}
 			token := utils.GenerateToken(user.ID.Hex(), env.JwtKey)
 
-			var appTokens []string
+			userToken := make(map[string]string)
+			userToken["token"] = token
+			userToken["user_id"] = user.ID.Hex()
 
-			appTokens = append(appTokens, token)
+			var appTokens []map[string]string
+
+			appTokens = append(appTokens, userToken)
 
 			redis.NewsCacheService{}.SetAppToken(ctx, "appToken", appTokens)
 
@@ -459,9 +460,13 @@ func (h Handler) GoogleLogin(input model.GoogleAuth, env *config.Env, ctx contex
 
 		token := utils.GenerateToken(user.ID.Hex(), env.JwtKey)
 
-		var appTokens []string
+		userToken := make(map[string]string)
+		userToken["token"] = token
+		userToken["user_id"] = user.ID.Hex()
 
-		appTokens = append(appTokens, token)
+		var appTokens []map[string]string
+
+		appTokens = append(appTokens, userToken)
 
 		redis.NewsCacheService{}.SetAppToken(ctx, "appToken", appTokens)
 
@@ -780,12 +785,13 @@ func (h Handler) Logout(input model.Logout, ctx context.Context) (*model.Generic
 		return nil, er
 	}
 
-	for i, token := range result {
-		if token == input.Token {
-			index := i
-			result = append(result[:index], result[index+1:]...)
+	for i, value := range result {
+		if value["token"] == input.Token {
+			result = append(result[:i], result[i+1:]...)
+			break
 		}
 	}
+
 	redis.NewsCacheService{}.SetAppToken(ctx, "appToken", result)
 
 	response := &model.GenericResponse{
@@ -1100,6 +1106,22 @@ func (h Handler) DeleteUserProfile(userID interface{}, ctx context.Context) (*mo
 		return nil, err
 	}
 
+	result := redis.NewsCacheService{}.GetAppToken(ctx, "appToken")
+
+	if result == nil {
+		er := errors.New("operation failed")
+		return nil, er
+	}
+
+	for i, value := range result {
+		if value["user_id"] == userID {
+			result = append(result[:i], result[i+1:]...)
+			break
+		}
+	}
+
+	redis.NewsCacheService{}.SetAppToken(ctx, "appToken", result)
+
 	response := &model.GenericResponse{
 		Message: "account deleted successful",
 	}
@@ -1122,8 +1144,9 @@ func (h Handler) EditUserProfile(userID interface{}, profile model.UpdateProfile
 	filter := bson.M{"_id": userIDHex}
 	data := bson.M{
 		"$set": bson.M{
-			"picture":   profile.Picture,
-			"full_name": profile.FullName,
+			"picture":      profile.Picture,
+			"full_name":    profile.FullName,
+			"phone_number": profile.PhoneNumber,
 		},
 	}
 

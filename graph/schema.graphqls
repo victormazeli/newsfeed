@@ -26,6 +26,7 @@ input Login {
 input UpdateProfile {
   picture: String
   full_name: String
+  phone_number: String
 }
 
 input Logout {

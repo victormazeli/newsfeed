@@ -38,6 +38,7 @@ func (r *mutationResolver) CreateNewUser(ctx context.Context, input model.Create
 		IsVerified:      &newUser.IsVerified,
 		IsOtpVerified:   &newUser.IsOtpVerified,
 		IsPasswordReset: &newUser.IsPasswordReset,
+		PhoneNumber:     &newUser.PhoneNumber,
 		Picture:         &newUser.Picture,
 		Topics:          newUser.Topics,
 		FullName:        &newUser.FullName,

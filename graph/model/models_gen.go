@@ -122,8 +122,9 @@ type SourceResponse struct {
 }
 
 type UpdateProfile struct {
-	Picture  *string `json:"picture"`
-	FullName *string `json:"full_name"`
+	Picture     *string `json:"picture"`
+	FullName    *string `json:"full_name"`
+	PhoneNumber *string `json:"phone_number"`
 }
 
 type User struct {

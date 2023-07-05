@@ -930,6 +930,7 @@ input Login {
 input UpdateProfile {
   picture: String
   full_name: String
+  phone_number: String
 }
 
 input Logout {
@@ -5543,6 +5544,14 @@ func (ec *executionContext) unmarshalInputUpdateProfile(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("full_name"))
 			it.FullName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "phone_number":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone_number"))
+			it.PhoneNumber, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
