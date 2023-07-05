@@ -155,11 +155,23 @@ func (h Handler) Login(input model.Login, env *config.Env, ctx context.Context) 
 	userToken["token"] = token
 	userToken["user_id"] = user.ID.Hex()
 
-	var appTokens []map[string]string
+	result := redis.NewsCacheService{}.GetAppToken(ctx, "appToken")
 
-	appTokens = append(appTokens, userToken)
+	if result == nil {
+		er := errors.New("operation failed")
+		return nil, er
+	}
 
-	redis.NewsCacheService{}.SetAppToken(ctx, "appToken", appTokens)
+	for i, value := range result {
+		if value["user_id"] == user.ID.Hex() {
+			result = append(result[:i], result[i+1:]...)
+			break
+		}
+	}
+
+	result = append(result, userToken)
+
+	redis.NewsCacheService{}.SetAppToken(ctx, "appToken", result)
 
 	response := &model.LoginResponse{
 		Token: token,
@@ -1101,7 +1113,7 @@ func (h Handler) DeleteUserProfile(userID interface{}, ctx context.Context) (*mo
 		return nil, err
 	}
 
-	_, err = mgm.Coll(&models.User{}).DeleteMany(ctx, bson.M{"user_id": userIDHex})
+	_, err = mgm.Coll(&models.User{}).DeleteOne(ctx, bson.M{"_id": userIDHex})
 	if err != nil {
 		return nil, err
 	}
