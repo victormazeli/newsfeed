@@ -37,13 +37,6 @@ func (h Handler) NewUser(input model.CreateUser, env *config.Env) (*models.User,
 		return nil, errMessage
 	}
 
-	//var topics []models.Topic
-	//topicsArray := input.Topics
-	//for i := 0; i < len(topicsArray); i++ {
-	//	topics = append(topics, models.Topic{
-	//		Topic: *topicsArray[i],
-	//	})
-	//}
 	hashPassword, e := utils.GenerateFromPassword(input.Password)
 	if e != nil {
 		errMessage := errors.New("an error occurred")
@@ -138,17 +131,11 @@ func (h Handler) Login(input model.Login, env *config.Env, ctx context.Context) 
 		return nil, errMessage
 	}
 
-	passwordMatch, e := utils.ComparePasswordAndHash(input.Password, user.Password)
-
-	if e != nil {
-		errMessage := errors.New("an error occurred")
-		return nil, errMessage
+	passwordMatch, err := utils.ComparePasswordAndHash(input.Password, user.Password)
+	if err != nil || !passwordMatch {
+		return nil, errors.New("invalid credentials")
 	}
 
-	if passwordMatch == false {
-		errMessage := errors.New("invalid credentials")
-		return nil, errMessage
-	}
 	token := utils.GenerateToken(user.ID.Hex(), env.JwtKey)
 
 	userToken := make(map[string]string)
@@ -156,21 +143,18 @@ func (h Handler) Login(input model.Login, env *config.Env, ctx context.Context) 
 	userToken["user_id"] = user.ID.Hex()
 
 	result := redis.NewsCacheService{}.GetAppToken(ctx, "appToken")
-
-	if result == nil {
-		er := errors.New("operation failed")
-		return nil, er
-	}
-
-	for i, value := range result {
-		if value["user_id"] == user.ID.Hex() {
-			result = append(result[:i], result[i+1:]...)
-			break
+	if result != nil {
+		for i, value := range result {
+			if value["user_id"] == user.ID.Hex() {
+				result = append(result[:i], result[i+1:]...)
+				break
+			}
 		}
+	} else {
+		result = make([]map[string]string, 0)
 	}
 
 	result = append(result, userToken)
-
 	redis.NewsCacheService{}.SetAppToken(ctx, "appToken", result)
 
 	response := &model.LoginResponse{
@@ -458,16 +442,27 @@ func (h Handler) GoogleLogin(input model.GoogleAuth, env *config.Env, ctx contex
 			userToken["token"] = token
 			userToken["user_id"] = user.ID.Hex()
 
-			var appTokens []map[string]string
+			result := redis.NewsCacheService{}.GetAppToken(ctx, "appToken")
+			if result != nil {
+				for i, value := range result {
+					if value["user_id"] == user.ID.Hex() {
+						result = append(result[:i], result[i+1:]...)
+						break
+					}
+				}
+			} else {
+				result = make([]map[string]string, 0)
+			}
 
-			appTokens = append(appTokens, userToken)
-
-			redis.NewsCacheService{}.SetAppToken(ctx, "appToken", appTokens)
+			result = append(result, userToken)
+			redis.NewsCacheService{}.SetAppToken(ctx, "appToken", result)
 
 			response := &model.LoginResponse{
 				Token: token,
 			}
+
 			return response, nil
+
 		}
 
 		token := utils.GenerateToken(user.ID.Hex(), env.JwtKey)
@@ -476,11 +471,20 @@ func (h Handler) GoogleLogin(input model.GoogleAuth, env *config.Env, ctx contex
 		userToken["token"] = token
 		userToken["user_id"] = user.ID.Hex()
 
-		var appTokens []map[string]string
+		result := redis.NewsCacheService{}.GetAppToken(ctx, "appToken")
+		if result != nil {
+			for i, value := range result {
+				if value["user_id"] == user.ID.Hex() {
+					result = append(result[:i], result[i+1:]...)
+					break
+				}
+			}
+		} else {
+			result = make([]map[string]string, 0)
+		}
 
-		appTokens = append(appTokens, userToken)
-
-		redis.NewsCacheService{}.SetAppToken(ctx, "appToken", appTokens)
+		result = append(result, userToken)
+		redis.NewsCacheService{}.SetAppToken(ctx, "appToken", result)
 
 		response := &model.LoginResponse{
 			Token: token,
@@ -530,7 +534,6 @@ func (h Handler) GetUserById(id interface{}) *models.User {
 
 func (h Handler) NewsFeed(id interface{}, query model.NewsQuery, ctx context.Context) ([]*model.Article, error) {
 	user := &models.User{}
-	var news []models.News
 	var categories []string
 	var filter bson.M
 	skip := (query.Page - 1) * query.PageSize
@@ -540,33 +543,22 @@ func (h Handler) NewsFeed(id interface{}, query model.NewsQuery, ctx context.Con
 		return nil, errors.New("user not found")
 	}
 
-	if query.Category != nil {
-		categories = append(categories, *query.Category)
-	} else {
-		for _, topic := range user.Topics {
-			if topic != nil {
-				categories = append(categories, *topic)
-			}
+	for _, topic := range user.Topics {
+		if topic != nil {
+			categories = append(categories, *topic)
 		}
 	}
 
 	if len(categories) == 0 {
-		//log.Print("log ...")
 		categories = append(categories, "top")
 	}
 
-	if query.Source == nil {
-		filter = bson.M{
-			"category": bson.M{"$in": categories},
-		}
-	} else {
-		//log.Print("log 1 ...")
-		//log.Printf(" categories :%v", categories)
-		//log.Printf("source : %v", *query.Source)
-		filter = bson.M{
-			"category":  bson.M{"$in": categories},
-			"source_id": query.Source,
-		}
+	filter = bson.M{
+		"category": bson.M{"$in": categories},
+	}
+
+	if query.Source != nil {
+		filter["source_id"] = query.Source
 	}
 
 	cursor, err := mgm.Coll(&models.News{}).Find(ctx, filter, options.Find().SetSkip(int64(skip)).SetLimit(int64(query.PageSize)))
@@ -574,13 +566,14 @@ func (h Handler) NewsFeed(id interface{}, query model.NewsQuery, ctx context.Con
 		return nil, err
 	}
 
-	if er := cursor.All(ctx, &news); err != nil {
-		return nil, er
+	var news []models.News
+	if err := cursor.All(ctx, &news); err != nil {
+		return nil, err
 	}
 
-	articleResponse := make([]*model.Article, 0, len(news))
-	for _, newsData := range news {
-		article := &model.Article{
+	articleResponse := make([]*model.Article, len(news))
+	for i, newsData := range news {
+		articleResponse[i] = &model.Article{
 			ID:          newsData.ID,
 			Title:       newsData.Title,
 			SourceID:    newsData.SourceID,
@@ -592,15 +585,85 @@ func (h Handler) NewsFeed(id interface{}, query model.NewsQuery, ctx context.Con
 			Description: newsData.Description,
 			Content:     newsData.Content,
 		}
-
-		if article != nil {
-			articleResponse = append(articleResponse, article)
-		}
-
 	}
 
 	return articleResponse, nil
 }
+
+//func (h Handler) NewsFeed(id interface{}, query model.NewsQuery, ctx context.Context) ([]*model.Article, error) {
+//	log.Printf("string id:%v", id)
+//	user := &models.User{}
+//	var news []models.News
+//	var categories []string
+//	var filter bson.M
+//	skip := (query.Page - 1) * query.PageSize
+//
+//	err := mgm.Coll(user).FindByID(id, user)
+//	if err != nil {
+//		return nil, errors.New("user not found")
+//	}
+//
+//	if query.Category != nil {
+//		categories = append(categories, *query.Category)
+//	} else {
+//		for _, topic := range user.Topics {
+//			if topic != nil {
+//				categories = append(categories, *topic)
+//			}
+//		}
+//	}
+//
+//	if len(categories) == 0 {
+//		//log.Print("log ...")
+//		categories = append(categories, "top")
+//	}
+//
+//	if query.Source == nil {
+//		filter = bson.M{
+//			"category": bson.M{"$in": categories},
+//		}
+//	} else {
+//		//log.Print("log 1 ...")
+//		//log.Printf(" categories :%v", categories)
+//		//log.Printf("source : %v", *query.Source)
+//		filter = bson.M{
+//			"category":  bson.M{"$in": categories},
+//			"source_id": query.Source,
+//		}
+//	}
+//
+//	cursor, err := mgm.Coll(&models.News{}).Find(ctx, filter, options.Find().SetSkip(int64(skip)).SetLimit(int64(query.PageSize)))
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	if er := cursor.All(ctx, &news); err != nil {
+//		return nil, er
+//	}
+//
+//	articleResponse := make([]*model.Article, 0, len(news))
+//	for _, newsData := range news {
+//		article := &model.Article{
+//			ID:          newsData.ID,
+//			Title:       newsData.Title,
+//			SourceID:    newsData.SourceID,
+//			Link:        newsData.Link,
+//			PubDate:     newsData.PubDate,
+//			Creator:     newsData.Creator,
+//			Category:    newsData.Category,
+//			ImageURL:    newsData.ImageURL,
+//			Description: newsData.Description,
+//			Content:     newsData.Content,
+//		}
+//
+//		if article != nil {
+//			articleResponse = append(articleResponse, article)
+//		}
+//
+//	}
+//
+//	return articleResponse, nil
+//}
 
 func (h Handler) AskChatGPT(input model.PromptContent, env *config.Env, ctx context.Context) (*model.PromptResponse, error) {
 	c := openai.NewClient(env.OpenAiKey)
@@ -1226,16 +1289,9 @@ func (h Handler) ChangeUserPassword(userID interface{}, input model.ChangePasswo
 		return nil, errMessage
 	}
 
-	passwordMatch, e := utils.ComparePasswordAndHash(input.OldPassword, user.Password)
-
-	if e != nil {
-		errMessage := errors.New("an error occurred")
-		return nil, errMessage
-	}
-
-	if passwordMatch == false {
-		errMessage := errors.New("invalid password")
-		return nil, errMessage
+	passwordMatch, err := utils.ComparePasswordAndHash(input.OldPassword, user.Password)
+	if err != nil || !passwordMatch {
+		return nil, errors.New("invalid credentials")
 	}
 
 	hashPassword, e := utils.GenerateFromPassword(input.NewPassword)
